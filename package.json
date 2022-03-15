@@ -6,7 +6,9 @@
     "start": "nx serve",
     "start:server": "nx serve server",
     "build": "nx build",
-    "test": "nx test"
+    "test": "nx test",
+    "db:start": "cp .env ./docker-compose && cd docker-compose && docker-compose up -d",
+    "db:stop": "cd docker-compose && docker-compose stop && rm .env"
   },
   "private": true,
   "devDependencies": {
