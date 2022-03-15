@@ -42,7 +42,8 @@
       "options": {
         "buildTarget": "client:build",
         "hmr": true,
-        "port": 80
+        "port": 80,
+        "proxyConfig": "apps/client/proxy.conf.json"
       },
       "configurations": {
         "production": {
