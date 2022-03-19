@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { AppResolver } from './app.resolver';
 import { ApolloDriver } from '@nestjs/apollo';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -15,14 +16,18 @@ import { ApolloDriver } from '@nestjs/apollo';
       // entities: [UserEntity],
     }),
     GraphQLModule.forRoot({
-      typePaths: ['./**/*.graphql'],
-      context: ({ res }) => ({ res }),
+      // typePaths: ['./**/*.graphql'],
+      // context: ({ res }) => ({ res }),
       playground: true,
       driver: ApolloDriver,
+      autoSchemaFile: 'schema.gql',
+      sortSchema: true,
     }),
+    UsersModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, AppResolver],
+  // controllers: [AppController],
+  // providers: [AppService, AppResolver],
+  providers: [],
 })
 export class AppModule {
 }

@@ -11,8 +11,10 @@ export const environment = {
     username: process.env.DB_USER_NAME,
     password: process.env.DB_USER_PASSWORD,
     database: process.env.DB_NAME,
-    dropSchema: false,
+    // dropSchema: false,
     synchronize: true,
     logging: false,
+    autoLoadEntities: true,
+    entities: [ __dirname + 'dist/**/*.entity{.ts,.js}' ],
   },
 }

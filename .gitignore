@@ -2,6 +2,7 @@
 
 # custom
 .env
+schema.gql
 
 # compiled output
 /dist
