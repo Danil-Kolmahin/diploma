@@ -1,8 +1,6 @@
-import { Mutation, Query, Resolver, Args } from '@nestjs/graphql';
+import { Args, ArgsType, Field, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { UsersEntity } from './users.entity';
-
-import { Field, ArgsType } from '@nestjs/graphql';
 import { CommonEntity } from '../common/common.entity';
 import { IsEmail, IsNotEmpty } from 'class-validator';
 import { ValidationPipe } from '@nestjs/common';
@@ -26,7 +24,7 @@ export class UsersResolver {
   }
 
   @Query(() => UsersEntity, { nullable: true })
-  async findUserById(@Args('id') id: string): Promise<UsersEntity | null> {
+  async findUserById(@Args('id') id: string): Promise<UsersEntity | undefined> {
     return this.usersService.findOneById(id);
   }
 

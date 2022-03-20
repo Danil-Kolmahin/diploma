@@ -1,14 +1,18 @@
 {
-  "singleQuote": true,
-  "trailingComma": "es5",
-  "overrides": [
-    {
-      "files": [
-        "**/.*rc"
-      ],
-      "options": {
-        "parser": "json"
-      }
-    }
-  ]
+	"singleQuote": true,
+	"trailingComma": "es5",
+	"overrides": [
+		{
+			"files": ["**/.*rc"],
+			"options": {
+				"parser": "json"
+			}
+		}
+	],
+	"printWidth": 80,
+	"tabWidth": 2,
+	"useTabs": true,
+	"semi": true,
+	"bracketSameLine": false,
+	"bracketSpacing": true
 }
