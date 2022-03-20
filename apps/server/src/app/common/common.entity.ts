@@ -2,7 +2,7 @@ import { CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } fr
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-@Entity('users')
+@Entity()
 export class CommonEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')

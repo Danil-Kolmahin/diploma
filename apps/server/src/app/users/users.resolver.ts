@@ -2,14 +2,19 @@ import { Mutation, Query, Resolver, Args } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { UsersEntity } from './users.entity';
 
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, ArgsType } from '@nestjs/graphql';
+import { CommonEntity } from '../common/common.entity';
+import { IsEmail, IsNotEmpty } from 'class-validator';
+import { ValidationPipe } from '@nestjs/common';
 
-@InputType()
-export class CreateUserInput {
+@ArgsType()
+class CreateUserArgs implements Omit<UsersEntity, keyof CommonEntity> {
   @Field()
+  @IsEmail()
   email: string;
 
   @Field()
+  @IsNotEmpty()
   password: string;
 }
 
@@ -21,17 +26,17 @@ export class UsersResolver {
   }
 
   @Query(() => UsersEntity, { nullable: true })
-  async findOneById(@Args('id') id: string): Promise<UsersEntity | null> {
+  async findUserById(@Args('id') id: string): Promise<UsersEntity | null> {
     return this.usersService.findOneById(id);
   }
 
   @Query(() => [UsersEntity])
-  async findAll(): Promise<UsersEntity[]> {
+  async findAllUsers(): Promise<UsersEntity[]> {
     return this.usersService.findAll();
   }
 
   @Mutation(() => UsersEntity)
-  async createOne(@Args('user') user: CreateUserInput): Promise<UsersEntity> {
+  async createUser(@Args('', new ValidationPipe()) user: CreateUserArgs): Promise<UsersEntity> {
     return this.usersService.createOne(user);
   }
 }
