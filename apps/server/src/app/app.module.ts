@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { environment } from '../environments/environment';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
@@ -9,7 +8,17 @@ import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      ...environment.connection,
+      type: process.env.DB_TYPE as 'aurora-data-api',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USER_NAME,
+      password: process.env.DB_USER_PASSWORD,
+      database: process.env.DB_NAME,
+      // dropSchema: false,
+      synchronize: true,
+      logging: false,
+      autoLoadEntities: true,
+      entities: [ __dirname + 'dist/**/*.entity{.ts,.js}' ],
       // entities: [UserEntity],
     }),
     GraphQLModule.forRoot({
