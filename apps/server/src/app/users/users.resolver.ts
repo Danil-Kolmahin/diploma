@@ -4,11 +4,11 @@ import { UsersEntity } from './users.entity';
 import { CommonEntity } from '../common/common.entity';
 import { IsEmail, IsNotEmpty } from 'class-validator';
 import { UseGuards, ValidationPipe } from '@nestjs/common';
-import { GqlAuthGuard } from '../auth/gql.auth-guard';
+import { Authorization, GqlAuthGuard } from '../auth/gql.auth-guard';
 import { AuthService } from '../auth/auth.service';
 
 @ArgsType()
-class CreateUserArgs implements Omit<UsersEntity, keyof CommonEntity> {
+class BaseUserArgs implements Omit<UsersEntity, keyof CommonEntity> {
   @Field()
   @IsEmail()
   email: string;
@@ -27,33 +27,32 @@ export class UsersResolver {
   }
 
   @Query(() => UsersEntity, { nullable: true })
-  @UseGuards(GqlAuthGuard)
   async findUserById(@Args('id') id: string): Promise<UsersEntity | undefined> {
     return this.usersService.findOneById(id);
   }
 
   @Query(() => [UsersEntity])
-  async findAllUsers(): Promise<UsersEntity[]> {
+  @UseGuards(GqlAuthGuard)
+  async findAllUsers(@Authorization() auth): Promise<UsersEntity[]> {
+    console.log(auth);
     return this.usersService.findAll();
   }
 
   @Mutation(() => UsersEntity)
-  async createUser(@Args('', new ValidationPipe()) user: CreateUserArgs): Promise<UsersEntity> {
+  async createUser(@Args('', new ValidationPipe()) user: BaseUserArgs): Promise<UsersEntity> {
     const modifiedUser = Object.assign(user, {
-      password: await this.authService.generateHash(user.password),
+      password: await this.authService.getHash(user.password),
     });
     return this.usersService.createOne(modifiedUser);
   }
 
   @Query(() => String)
-  async login(
-    @Args() signInPayload: CreateUserArgs,
-  ): Promise<string> {
-    return JSON.stringify(await this.authService.login(signInPayload));
+  async login(@Args() userArgs: BaseUserArgs): Promise<string> {
+    return this.authService.login(userArgs);
   }
 
-  @Query(() => Boolean)
-  async logout(): Promise<boolean> {
-    return true;
-  }
+  // @Query(() => Boolean)
+  // async logout(): Promise<boolean> {
+  //   return true;
+  // }
 }
