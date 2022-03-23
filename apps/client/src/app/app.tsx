@@ -1,5 +1,8 @@
+import { Routes, Route } from 'react-router-dom';
 import styled from '@emotion/styled';
-import NxWelcome from './nx-welcome';
+import { Main } from './main/main';
+import { Login } from './login/login';
+import { Settings } from './settings/settings';
 
 const StyledApp = styled.div`
   // Your style here
@@ -8,7 +11,11 @@ const StyledApp = styled.div`
 export function App() {
   return (
     <StyledApp>
-      <NxWelcome title="client" />
+      <Routes>
+        <Route path='/' element={<Main />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/settings' element={<Settings />} />
+      </Routes>
     </StyledApp>
   );
 }
