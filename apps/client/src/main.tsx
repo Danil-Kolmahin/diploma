@@ -1,14 +1,21 @@
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import App from './app/app';
+
+const client = new ApolloClient({
+  uri: `http://${process.env['NX_DB_HOST']}:${process.env['NX_API_PORT']}/graphql?`,
+  cache: new InMemoryCache()
+});
 
 ReactDOM.render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <ApolloProvider client={client}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ApolloProvider>
   </StrictMode>,
   document.getElementById('root'),
 );

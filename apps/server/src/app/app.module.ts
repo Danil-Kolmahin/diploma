@@ -9,7 +9,7 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     TypeOrmModule.forRoot({
       type: process.env.DB_TYPE as 'aurora-data-api',
-      host: process.env.DB_HOST,
+      host: process.env.NX_DB_HOST,
       port: Number(process.env.DB_PORT),
       username: process.env.DB_USER_NAME,
       password: process.env.DB_USER_PASSWORD,

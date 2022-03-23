@@ -32,9 +32,7 @@ export class UsersResolver {
   }
 
   @Query(() => [UsersEntity])
-  @UseGuards(GqlAuthGuard)
-  async findAllUsers(@Authorization() auth): Promise<UsersEntity[]> {
-    console.log(auth);
+  async findAllUsers(): Promise<UsersEntity[]> {
     return this.usersService.findAll();
   }
 
@@ -51,8 +49,11 @@ export class UsersResolver {
     return this.authService.login(userArgs);
   }
 
-  // @Query(() => Boolean)
-  // async logout(): Promise<boolean> {
-  //   return true;
-  // }
+  /* Useless */
+  @Query(() => Boolean)
+  @UseGuards(GqlAuthGuard)
+  async logout(@Authorization() auth): Promise<boolean> {
+    console.log(auth);
+    return true;
+  }
 }
