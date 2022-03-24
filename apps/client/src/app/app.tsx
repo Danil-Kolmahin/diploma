@@ -9,6 +9,7 @@ const StyledApp = styled.div`
 `;
 
 // npm install dayjs @mantine/prism @mantine/notifications @mantine/modals @mantine/hooks @mantine/form @mantine/dropzone @mantine/dates @mantine/core
+// npm install tabler-icons-react
 
 export function App() {
   return (

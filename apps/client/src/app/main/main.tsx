@@ -1,4 +1,6 @@
 import { useQuery, gql } from '@apollo/client';
+import { useCallback } from 'react';
+import { Buffer } from 'buffer';
 
 const DATA = gql`
   query findAllUsers {
@@ -13,6 +15,22 @@ const DATA = gql`
 `;
 
 export const Main = () => {
+  const getCookies = useCallback(() => {
+    const keysValues = document.cookie.split('; ');
+    const result: { [key: string]: string } = {};
+    for (const keyValue of keysValues) {
+      const [key, value] = keyValue.split('=');
+      result[key] = value;
+    }
+    return result;
+  }, []);
+
+  const parseJwt = useCallback((token: string) => {
+    const [, base64Payload] = token.split('.');
+    const payload = Buffer.from(base64Payload, 'base64');
+    return JSON.parse(payload.toString());
+  }, []);
+
   const { loading, error, data } = useQuery(DATA);
 
   if (loading) return <p>Loading...</p>;
@@ -21,11 +39,15 @@ export const Main = () => {
   return (
     <>
       <p>Main...</p>
-      {data.findAllUsers.map(
-        (data: unknown, i: number) =>  <div key={i}><br/><code>
-          {JSON.stringify(data, null, 2)}
-        </code></div>,
-      )}
+      <code>
+        {JSON.stringify(
+          parseJwt(getCookies()[process.env['NX_AUTH_COOKIE_NAME'] as string]),
+          null, 2,
+        )}
+      </code>
+      <br />
+      <br />
+      <code>{JSON.stringify(data.findAllUsers, null, 2)}</code>
     </>
   );
 };
