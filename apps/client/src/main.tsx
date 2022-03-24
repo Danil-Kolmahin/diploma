@@ -5,8 +5,9 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import App from './app/app';
 
 const client = new ApolloClient({
-  uri: `http://${process.env['NX_DB_HOST']}:${process.env['NX_API_PORT']}/graphql?`,
-  cache: new InMemoryCache()
+  uri: `${process.env['NX_API_PROTOCOL']}://${process.env['NX_API_HOST']}:${process.env['NX_API_PORT']}/graphql?`,
+  cache: new InMemoryCache(),
+  credentials: 'include',
 });
 
 ReactDOM.render(

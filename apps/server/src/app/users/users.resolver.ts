@@ -4,7 +4,7 @@ import { UsersEntity } from './users.entity';
 import { CommonEntity } from '../common/common.entity';
 import { IsEmail, IsNotEmpty } from 'class-validator';
 import { UseGuards, ValidationPipe } from '@nestjs/common';
-import { Authorization, GqlAuthGuard } from '../auth/gql.auth-guard';
+import { Auth, GqlAuthGuard, GQLRequest } from '../auth/gql.auth-guard';
 import { AuthService } from '../auth/auth.service';
 
 @ArgsType()
@@ -32,6 +32,7 @@ export class UsersResolver {
   }
 
   @Query(() => [UsersEntity])
+  @UseGuards(GqlAuthGuard)
   async findAllUsers(): Promise<UsersEntity[]> {
     return this.usersService.findAll();
   }
@@ -44,16 +45,20 @@ export class UsersResolver {
     return this.usersService.createOne(modifiedUser);
   }
 
-  @Query(() => String)
-  async login(@Args() userArgs: BaseUserArgs): Promise<string> {
-    return this.authService.login(userArgs);
+  @Query(() => Boolean)
+  async login(
+    @Args('', new ValidationPipe()) userArgs: BaseUserArgs,
+    @GQLRequest() request,
+  ): Promise<true | never> {
+    const token = await this.usersService.login(userArgs);
+    request.res.cookie(process.env.NX_AUTH_COOKIE_NAME, token);
+    return true;
   }
 
-  /* Useless */
   @Query(() => Boolean)
   @UseGuards(GqlAuthGuard)
-  async logout(@Authorization() auth): Promise<boolean> {
-    console.log(auth);
+  async logout(@Auth() auth, @GQLRequest() request): Promise<true> {
+    request.res.clearCookie(process.env.NX_AUTH_COOKIE_NAME);
     return true;
   }
 }

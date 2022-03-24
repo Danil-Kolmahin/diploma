@@ -1,14 +1,16 @@
 import { Repository } from 'typeorm';
 import { UsersEntity } from './users.entity';
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommonEntity } from '../common/common.entity';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
+    private readonly authService: AuthService,
   ) {
   }
 
@@ -33,5 +35,17 @@ export class UsersService {
       throw e;
     }
     return savedUser;
+  }
+
+  async login(signInPayload) {
+    const user = await this.findOneByEmail(signInPayload.email);
+    if (!user) throw new UnauthorizedException();
+
+    const isValid = await this.authService.compareHash(
+      signInPayload.password, user.password,
+    );
+    if (!isValid) throw new UnauthorizedException();
+
+    return this.authService.generateToken({ email: user.email, id: user.id });
   }
 }

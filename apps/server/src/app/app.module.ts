@@ -9,7 +9,7 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     TypeOrmModule.forRoot({
       type: process.env.DB_TYPE as 'aurora-data-api',
-      host: process.env.NX_DB_HOST,
+      host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
       username: process.env.DB_USER_NAME,
       password: process.env.DB_USER_PASSWORD,
@@ -28,6 +28,16 @@ import { AuthModule } from './auth/auth.module';
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
       sortSchema: true,
+      // context: ({ request, reply }) => {
+      //   return {
+      //     request,
+      //     response: reply,
+      //   };
+      // },
+      cors: {
+        credentials: true,
+        origin: `${process.env.NX_API_PROTOCOL}://${process.env.NX_API_HOST}`,
+      }
     }),
     UsersModule,
     AuthModule,

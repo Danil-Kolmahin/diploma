@@ -1,19 +1,63 @@
-import { createParamDecorator, ExecutionContext, Injectable } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
+import { AuthService } from './auth.service';
+import * as jwt from 'jsonwebtoken';
 
-export const Authorization = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const gqlCtx = GqlExecutionContext.create(ctx);
+interface CookieTokenDataI {
+  email: string;
+  id: string;
+  iat: number;
+  exp: number;
+}
+
+export const parseCookies = (cookies: string): { [key: string]: string } => {
+  const keysValues = cookies
+    .split('; ');
+  const result = {};
+  for (const keyValue of keysValues) {
+    const [key, value] = keyValue.split('=');
+    result[key] = value;
+  }
+  return result;
+};
+
+export const GQLRequest = createParamDecorator(
+  (data: unknown, context: ExecutionContext) => {
+    const gqlCtx = GqlExecutionContext.create(context);
+    return gqlCtx.getContext().req;
+  },
+);
+
+export const Auth = createParamDecorator(
+  (data: unknown, context: ExecutionContext) => {
+    const gqlCtx = GqlExecutionContext.create(context);
     const request = gqlCtx.getContext().req;
-    return request.user;
+    const token = parseCookies(
+      request.headers.cookie,
+    )[process.env.NX_AUTH_COOKIE_NAME];
+    return jwt.decode(token); // maybe service better?
   },
 );
 
 @Injectable()
 export class GqlAuthGuard extends AuthGuard('jwt') {
-  getRequest(context: ExecutionContext) {
-    const ctx = GqlExecutionContext.create(context);
-    return ctx.getContext().req;
+  constructor(private authService: AuthService) {
+    super();
+  }
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const gqlCtx = GqlExecutionContext.create(context);
+    const request = gqlCtx.getContext().req;
+
+    const token = parseCookies(
+      request.headers.cookie,
+    )[process.env.NX_AUTH_COOKIE_NAME];
+
+    const data = await this.authService.parseToken(token) as CookieTokenDataI;
+
+    if (!data || data.exp * 1000 <= Date.now()) throw new UnauthorizedException();
+
+    return true;
   }
 }

@@ -8,6 +8,8 @@ const StyledApp = styled.div`
   // Your style here
 `;
 
+// npm install dayjs @mantine/prism @mantine/notifications @mantine/modals @mantine/hooks @mantine/form @mantine/dropzone @mantine/dates @mantine/core
+
 export function App() {
   return (
     <StyledApp>
