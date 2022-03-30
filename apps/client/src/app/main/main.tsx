@@ -1,6 +1,8 @@
 import { useQuery, gql } from '@apollo/client';
 import { useCallback } from 'react';
 import { Buffer } from 'buffer';
+import { AppShell, Code, Group, Header, Text, useMantineTheme } from '@mantine/core';
+import { Logo } from '../_logo';
 
 const DATA = gql`
   query findAllUsers {
@@ -15,6 +17,8 @@ const DATA = gql`
 `;
 
 export const Main = () => {
+  const theme = useMantineTheme();
+
   const getCookies = useCallback(() => {
     const keysValues = document.cookie.split('; ');
     const result: { [key: string]: string } = {};
@@ -33,21 +37,32 @@ export const Main = () => {
 
   const { loading, error, data } = useQuery(DATA);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error :(</p>;
-
   return (
-    <>
-      <p>Main...</p>
-      <code>
-        {JSON.stringify(
-          parseJwt(getCookies()[process.env['NX_AUTH_COOKIE_NAME'] as string]),
-          null, 2,
-        )}
-      </code>
-      <br />
-      <br />
-      <code>{JSON.stringify(data.findAllUsers, null, 2)}</code>
-    </>
+    <AppShell
+      fixed
+      header={
+        <Header height={60}>
+          <Group sx={{ height: '100%' }} px={20} position='apart'>
+            <Logo colorScheme={theme.colorScheme} />
+          </Group>
+        </Header>
+      }
+    >
+
+      {loading ? <p>Loading...</p> : error ? <p>Error :(</p> : <>
+        <Text>Main...</Text>
+        <Code>
+          {JSON.stringify(
+            parseJwt(getCookies()[process.env['NX_AUTH_COOKIE_NAME'] as string]),
+            null, 2,
+          )}
+        </Code>;
+        <br />;
+        <br />;
+        <Code>{JSON.stringify(data.findAllUsers, null, 2)}</Code>
+      </>
+      }
+
+    </AppShell>
   );
 };

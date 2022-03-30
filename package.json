@@ -3,10 +3,10 @@
 	"version": "0.0.0",
 	"license": "MIT",
 	"scripts": {
-		"start": "nx serve",
-		"start:server": "nx serve server",
-		"build": "nx build",
-		"test": "nx test",
+		"client:watch": "nx serve",
+		"server:watch": "nx serve server",
+		"client:build": "nx build",
+		"client:test": "nx test",
 		"db:start": "docker-compose up -d",
 		"db:stop": "docker-compose stop"
 	},
@@ -54,6 +54,14 @@
 	"dependencies": {
 		"@emotion/react": "11.8.2",
 		"@emotion/styled": "11.3.0",
+		"@mantine/core": "^4.0.7",
+		"@mantine/dates": "^4.0.7",
+		"@mantine/dropzone": "^4.0.7",
+		"@mantine/form": "^4.0.7",
+		"@mantine/hooks": "^4.0.7",
+		"@mantine/modals": "^4.0.7",
+		"@mantine/notifications": "^4.0.7",
+		"@mantine/prism": "^4.0.7",
 		"@nestjs/apollo": "^10.0.7",
 		"@nestjs/common": "^8.0.0",
 		"@nestjs/core": "^8.0.0",
@@ -67,6 +75,7 @@
 		"class-transformer": "^0.5.1",
 		"class-validator": "^0.13.2",
 		"core-js": "^3.6.5",
+		"dayjs": "^1.10.8",
 		"graphql": "^15.8.0",
 		"graphql-tools": "^8.2.0",
 		"graphql-type-json": "^0.3.2",
@@ -79,6 +88,7 @@
 		"reflect-metadata": "^0.1.13",
 		"regenerator-runtime": "0.13.7",
 		"rxjs": "^7.0.0",
+		"tabler-icons-react": "^1.41.0",
 		"tslib": "^2.0.0",
 		"typeorm": "^0.2.45"
 	}

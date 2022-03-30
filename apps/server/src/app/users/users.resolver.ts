@@ -32,7 +32,6 @@ export class UsersResolver {
   }
 
   @Query(() => [UsersEntity])
-  @UseGuards(GqlAuthGuard)
   async findAllUsers(): Promise<UsersEntity[]> {
     return this.usersService.findAll();
   }
@@ -45,7 +44,7 @@ export class UsersResolver {
     return this.usersService.createOne(modifiedUser);
   }
 
-  @Query(() => Boolean)
+  @Mutation(() => Boolean)
   async login(
     @Args('', new ValidationPipe()) userArgs: BaseUserArgs,
     @GQLRequest() request,
@@ -55,7 +54,7 @@ export class UsersResolver {
     return true;
   }
 
-  @Query(() => Boolean)
+  @Mutation(() => Boolean)
   @UseGuards(GqlAuthGuard)
   async logout(@Auth() auth, @GQLRequest() request): Promise<true> {
     request.res.clearCookie(process.env.NX_AUTH_COOKIE_NAME);

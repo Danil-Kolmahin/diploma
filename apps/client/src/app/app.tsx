@@ -1,25 +1,24 @@
 import { Routes, Route } from 'react-router-dom';
-import styled from '@emotion/styled';
+// import styled from '@emotion/styled';
 import { Main } from './main/main';
 import { Login } from './login/login';
 import { Settings } from './settings/settings';
+import { withAuth } from './HOC/auth';
 
-const StyledApp = styled.div`
-  // Your style here
-`;
+// const StyledApp = styled.div`
+//   // Your style here
+// `;
 
-// npm install dayjs @mantine/prism @mantine/notifications @mantine/modals @mantine/hooks @mantine/form @mantine/dropzone @mantine/dates @mantine/core
-// npm install tabler-icons-react
+const AuthSettings = withAuth(Settings);
 
 export function App() {
   return (
-    <StyledApp>
-      <Routes>
-        <Route path='/' element={<Main />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/settings' element={<Settings />} />
-      </Routes>
-    </StyledApp>
+    <Routes>
+      <Route path='/' element={<Main />} />
+      <Route path='/login' element={<Login />} />
+      <Route path='/register' element={<Login />} />
+      <Route path='/settings' element={<AuthSettings />} />
+    </Routes>
   );
 }
 
