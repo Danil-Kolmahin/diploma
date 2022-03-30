@@ -14,7 +14,11 @@
 		"skipLibCheck": true,
 		"skipDefaultLibCheck": true,
 		"baseUrl": ".",
-		"paths": {}
+		"paths": {
+			"@diploma-v2/common/utils-common": [
+				"libs/common/utils-common/src/index.ts"
+			]
+		}
 	},
 	"exclude": ["node_modules", "tmp"]
 }

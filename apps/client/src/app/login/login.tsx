@@ -42,10 +42,6 @@ const LOGIN = gql`
   }
 `;
 
-const timeout = async (ms: number) => {
-  return new Promise((r) => setTimeout(r, ms));
-}
-
 export const Login = () => {
   const isRegister = useMatch('register');
   const navigate = useNavigate();

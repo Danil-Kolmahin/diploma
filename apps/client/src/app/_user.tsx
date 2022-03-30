@@ -3,14 +3,7 @@ import { Logout } from 'tabler-icons-react';
 import { UnstyledButton, Group, Avatar, Text, Box, useMantineTheme } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { gql, useMutation } from '@apollo/client';
-
-function convertToHex(str: string) {
-  let hex = '';
-  for (let i = 0; i < str.length; i++) {
-    hex += '' + str.charCodeAt(i).toString(16);
-  }
-  return hex;
-}
+import { convertToHex } from '@diploma-v2/common/utils-common';
 
 const LOGOUT = gql`
   mutation logout {

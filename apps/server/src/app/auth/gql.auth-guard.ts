@@ -3,6 +3,7 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import * as jwt from 'jsonwebtoken';
+import { parseCookies } from '@diploma-v2/common/utils-common';
 
 interface CookieTokenDataI {
   email: string;
@@ -10,17 +11,6 @@ interface CookieTokenDataI {
   iat: number;
   exp: number;
 }
-
-export const parseCookies = (cookies: string): { [key: string]: string } => {
-  const keysValues = cookies
-    .split('; ');
-  const result = {};
-  for (const keyValue of keysValues) {
-    const [key, value] = keyValue.split('=');
-    result[key] = value;
-  }
-  return result;
-};
 
 export const GQLRequest = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {

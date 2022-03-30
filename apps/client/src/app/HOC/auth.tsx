@@ -1,16 +1,7 @@
 import React from 'react';
 import { Buffer } from 'buffer';
 import { Navigate } from 'react-router-dom';
-
-const getCookies = () => {
-  const keysValues = document.cookie.split('; ');
-  const result: { [key: string]: string } = {};
-  for (const keyValue of keysValues) {
-    const [key, value] = keyValue.split('=');
-    result[key] = value;
-  }
-  return result;
-};
+import { isObject, parseCookies } from '@diploma-v2/common/utils-common';
 
 const parseJwt = (token: string) => {
   const [, base64Payload] = token.split('.');
@@ -18,16 +9,12 @@ const parseJwt = (token: string) => {
   return JSON.parse(payload.toString());
 };
 
-const isObject = (candidate: unknown) => {
-  return typeof candidate === 'object' &&
-    !Array.isArray(candidate) &&
-    candidate !== null;
-};
-
 export const withAuth = (WrappedComponent: React.ComponentType, shouldAuth = true) => {
   let cookie = '';
   try {
-    const cookieCandidate = getCookies()[process.env['NX_AUTH_COOKIE_NAME'] as string];
+    const cookieCandidate = parseCookies(
+      document.cookie
+    )[process.env['NX_AUTH_COOKIE_NAME'] as string];
     const parsedCookie = parseJwt(cookieCandidate);
     if (parsedCookie) cookie = parsedCookie;
   } catch (e) {
