@@ -57,14 +57,14 @@ export const Login = () => {
     },
 
     validationRules: {
-      email: (value) => /^\S+@\S+$/.test(value),
-      password: (value) => /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(value),
+      email: (value) => /^\S+@\S+\.\S+$/.test(value),
+      password: (value) => !!value,
       confirmPassword: (val, values) => !isRegister || val === values?.password,
     },
 
     errorMessages: {
       email: 'Invalid email',
-      password: 'Password should contain 1 number, 1 letter and at least 6 characters',
+      password: 'Password should contain at least 1 character',
       confirmPassword: 'Passwords don\'t match. Try again',
     },
   });

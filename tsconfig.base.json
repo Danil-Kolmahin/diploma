@@ -15,6 +15,9 @@
 		"skipDefaultLibCheck": true,
 		"baseUrl": ".",
 		"paths": {
+			"@diploma-v2/common/types-common": [
+				"libs/common/types-common/src/index.ts"
+			],
 			"@diploma-v2/common/utils-common": [
 				"libs/common/utils-common/src/index.ts"
 			]

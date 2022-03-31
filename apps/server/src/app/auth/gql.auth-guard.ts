@@ -4,13 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import * as jwt from 'jsonwebtoken';
 import { parseCookies } from '@diploma-v2/common/utils-common';
-
-interface CookieTokenDataI {
-  email: string;
-  id: string;
-  iat: number;
-  exp: number;
-}
+import { CookieTokenDataI } from '@diploma-v2/common/types-common';
 
 export const GQLRequest = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
