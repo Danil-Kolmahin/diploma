@@ -15,7 +15,7 @@ ReactDOM.render(
   <StrictMode>
     <ApolloProvider client={client}>
       <BrowserRouter>
-        <MantineProvider theme={{ colorScheme: 'dark' }}>
+        <MantineProvider theme={{ colorScheme: 'dark', loader: 'bars' }}>
           <Global
             styles={(theme) => ({
               body: {

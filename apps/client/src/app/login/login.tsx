@@ -43,137 +43,140 @@ const LOGIN = gql`
 `;
 
 export const Login = () => {
-  const isRegister = useMatch('register');
-  const navigate = useNavigate();
-  const [error, setError] = useState<string>();
-  const theme = useMantineTheme();
+    const isRegister = useMatch('register');
+    const navigate = useNavigate();
+    const [error, setError] = useState<string>();
+    const theme = useMantineTheme();
 
-  const form = useForm({
-    initialValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
-      termsOfService: true,
-    },
+    const form = useForm({
+      initialValues: {
+        email: '',
+        password: '',
+        confirmPassword: '',
+        termsOfService: true,
+      },
 
-    validationRules: {
-      email: (value) => /^\S+@\S+\.\S+$/.test(value),
-      password: (value) => !!value,
-      confirmPassword: (val, values) => !isRegister || val === values?.password,
-    },
+      validationRules: {
+        email: (value) => /^\S+@\S+\.\S+$/.test(value),
+        password: (value) => !!value,
+        confirmPassword: (val, values) => !isRegister || val === values?.password,
+      },
 
-    errorMessages: {
-      email: 'Invalid email',
-      password: 'Password should contain at least 1 character',
-      confirmPassword: 'Passwords don\'t match. Try again',
-    },
-  });
-
-  const toggleFormType = () => {
-    setError(undefined);
-    navigate(isRegister ? '/login' : '/register');
-  };
-
-  const [createUser, {
-    loading: createUserLoading, error: createUserError,
-  }] = useMutation(CREATE_NEW_USER);
-
-  const [login, {
-    loading: loginLoading, error: loginError,
-  }] = useMutation(LOGIN);
-
-  const handleSubmit = async (values: typeof form.values) => {
-    setError(undefined);
-    isRegister && await createUser({
-      variables: { email: values.email, password: values.password }
+      errorMessages: {
+        email: 'Invalid email',
+        password: 'Password should contain at least 1 character',
+        confirmPassword: 'Passwords don\'t match. Try again',
+      },
     });
-    await login({
-      variables: { email: values.email, password: values.password }
-    });
-    !createUserError && !loginError && navigate('/settings');
-  };
 
-  return (
-    <Group style={{
-      display: 'flex',
-      height: '100%',
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}>
-      <Paper
-        p={'lg'}
-        shadow={'sm'}
-        style={{
-          maxWidth: 400,
-          backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
-        }}
-      >
-        <form onSubmit={form.onSubmit(handleSubmit)}>
-          <LoadingOverlay visible={createUserLoading || loginLoading} />
+    const toggleFormType = () => {
+      setError(undefined);
+      navigate(isRegister ? '/login' : '/register');
+    };
 
-          <TextInput
-            required
-            placeholder='Your email'
-            label='Email'
-            icon={<Mail />}
-            {...form.getInputProps('email')}
-          />
+    const [createUser, {
+      loading: createUserLoading,
+    }] = useMutation(CREATE_NEW_USER);
 
-          <PasswordInput
-            mt='md'
-            required
-            placeholder='Password'
-            label='Password'
-            icon={<Lock />}
-            {...form.getInputProps('password')}
-          />
+    const [login, { loading: loginLoading }] = useMutation(LOGIN);
 
-          {isRegister && (
+    const handleSubmit = async (values: typeof form.values) => {
+      setError(undefined);
+      try {
+        isRegister && await createUser({
+          variables: { email: values.email, password: values.password },
+        });
+        await login({
+          variables: { email: values.email, password: values.password },
+        });
+        navigate('/settings');
+      } catch (e: any) {
+        setError(e?.message ? e.message : 'Server error');
+      }
+    };
+
+    return (
+      <Group style={{
+        display: 'flex',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+        <Paper
+          p={'lg'}
+          shadow={'sm'}
+          style={{
+            maxWidth: 400,
+            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
+          }}
+        >
+          <form onSubmit={form.onSubmit(handleSubmit)}>
+            <LoadingOverlay visible={createUserLoading || loginLoading} />
+
+            <TextInput
+              required
+              placeholder='Your email'
+              label='Email'
+              icon={<Mail />}
+              {...form.getInputProps('email')}
+            />
+
             <PasswordInput
               mt='md'
               required
-              label='Confirm Password'
-              placeholder='Confirm password'
+              placeholder='Password'
+              label='Password'
               icon={<Lock />}
-              {...form.getInputProps('confirmPassword')}
+              {...form.getInputProps('password')}
             />
-          )}
 
-          {isRegister && (
-            <Checkbox
-              mt='xl'
-              label='I agree to sell my soul and privacy to this corporation'
-              {...form.getInputProps('termsOfService', { type: 'checkbox' })}
-            />
-          )}
+            {isRegister && (
+              <PasswordInput
+                mt='md'
+                required
+                label='Confirm Password'
+                placeholder='Confirm password'
+                icon={<Lock />}
+                {...form.getInputProps('confirmPassword')}
+              />
+            )}
 
-          {(error || createUserError || loginError) && (
-            <Text color='red' size='sm' mt='sm'>
-              {error || createUserError || loginError}
-            </Text>
-          )}
+            {isRegister && (
+              <Checkbox
+                mt='xl'
+                label='I agree to sell my soul and privacy to this corporation'
+                {...form.getInputProps('termsOfService', { type: 'checkbox' })}
+              />
+            )}
 
-          {
-            <Group position='apart' mt='xl'>
-              <Anchor
-                component='button'
-                type='button'
-                color='gray'
-                onClick={toggleFormType}
-                size='sm'
-              >
-                {isRegister
-                  ? 'Have an account? Login'
-                  : 'Don\'t have an account? Register'}
-              </Anchor>
+            {(error) && (
+              <Text color='red' size='sm' mt='sm'>
+                {error}
+              </Text>
+            )}
 
-              <Button color='blue' type='submit'>
-                {isRegister ? 'Register' : 'Login'}
-              </Button>
-            </Group>
-          }
-        </form>
-      </Paper>
-    </Group>
-  );
-};
+            {
+              <Group position='apart' mt='xl'>
+                <Anchor
+                  component='button'
+                  type='button'
+                  color='gray'
+                  onClick={toggleFormType}
+                  size='sm'
+                >
+                  {isRegister
+                    ? 'Have an account? Login'
+                    : 'Don\'t have an account? Register'}
+                </Anchor>
+
+                <Button color='blue' type='submit'>
+                  {isRegister ? 'Register' : 'Login'}
+                </Button>
+              </Group>
+            }
+          </form>
+        </Paper>
+      </Group>
+    );
+  }
+;
