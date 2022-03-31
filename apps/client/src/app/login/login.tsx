@@ -45,7 +45,8 @@ const LOGIN = gql`
 export const Login = () => {
     const isRegister = useMatch('register');
     const navigate = useNavigate();
-    const [error, setError] = useState<string>();
+    const [error, setError] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(false);
     const theme = useMantineTheme();
 
     const form = useForm({
@@ -70,18 +71,16 @@ export const Login = () => {
     });
 
     const toggleFormType = () => {
-      setError(undefined);
+      setError('');
       navigate(isRegister ? '/login' : '/register');
     };
 
-    const [createUser, {
-      loading: createUserLoading,
-    }] = useMutation(CREATE_NEW_USER);
-
-    const [login, { loading: loginLoading }] = useMutation(LOGIN);
+    const [createUser] = useMutation(CREATE_NEW_USER);
+    const [login] = useMutation(LOGIN);
 
     const handleSubmit = async (values: typeof form.values) => {
-      setError(undefined);
+      setLoading(true);
+      setError('');
       try {
         isRegister && await createUser({
           variables: { email: values.email, password: values.password },
@@ -91,8 +90,9 @@ export const Login = () => {
         });
         navigate('/settings');
       } catch (e: any) {
-        setError(e?.message ? e.message : 'Server error');
+        setError(e.message ? e.message : 'Server error');
       }
+      setLoading(false);
     };
 
     return (
@@ -111,7 +111,7 @@ export const Login = () => {
           }}
         >
           <form onSubmit={form.onSubmit(handleSubmit)}>
-            <LoadingOverlay visible={createUserLoading || loginLoading} />
+            <LoadingOverlay visible={loading} />
 
             <TextInput
               required

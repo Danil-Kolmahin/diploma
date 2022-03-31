@@ -10,7 +10,7 @@ const parseJwt = (token: string) => {
   return JSON.parse(payload.toString());
 };
 
-const EMPTY_COOKIES = {
+const EMPTY_COOKIES: CookieTokenDataI = {
   id: '12345678-1234-1234-12345678',
   email: 'unknown@email.com',
   exp: 0,

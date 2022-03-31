@@ -1,3 +1,4 @@
+import React from 'react';
 import { AppShell, Group, Header, Navbar, useMantineTheme } from '@mantine/core';
 import { MainLinks } from '../_mainLinks';
 import { Logo } from '../_logo';
@@ -6,7 +7,7 @@ import { useState } from 'react';
 
 export const Settings = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
-  const [text, setText] = useState('Settings...')
+  const [text, setText] = useState('Settings...');
 
   return (
     <AppShell
@@ -28,8 +29,9 @@ export const Settings = ({ parsedCookie }: any) => {
 
       <p>{text}</p>
       <button onClick={() => {
-        setText(text + setText)
-      }}>Button</button>
+        setText(text + setText);
+      }}>Button
+      </button>
 
     </AppShell>
   );
