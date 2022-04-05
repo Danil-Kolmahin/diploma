@@ -1,13 +1,11 @@
 import React from 'react';
-import { ActionIcon, AppShell, Group, Header, Navbar, useMantineColorScheme, useMantineTheme } from '@mantine/core';
+import { AppShell, Group, Header, Navbar, useMantineTheme, Title } from '@mantine/core';
 import { MainLinks } from '../_mainLinks';
 import { Logo } from '../_logo';
 import { User } from '../_user';
-import { MoonStars, Sun } from 'tabler-icons-react';
 
-export const Settings = ({ parsedCookie }: any) => {
+export const NotFound = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   return (
     <AppShell
@@ -27,9 +25,24 @@ export const Settings = ({ parsedCookie }: any) => {
       }
     >
 
-      <ActionIcon variant='default' onClick={() => toggleColorScheme()} size={30}>
-        {colorScheme === 'dark' ? <Sun size={16} /> : <MoonStars size={16} />}
-      </ActionIcon>
+      <Group style={{
+        height: '100%',
+        textAlign: 'center',
+      }}>
+        <Title
+          order={1}
+          align='center'
+          style={{
+            color: theme.colorScheme === 'dark' ? '#fff' : '#000',
+            width: '100%',
+            fontSize: 80,
+            display: 'inline-block',
+            verticalAlign: 'middle',
+        }}
+        >
+          404 not found
+        </Title>
+      </Group>
 
     </AppShell>
   );

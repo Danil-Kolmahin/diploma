@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, FileDiff } from 'tabler-icons-react';
+import { Settings, FileDiff, History, FileCertificate } from 'tabler-icons-react';
 import { ThemeIcon, UnstyledButton, Group, Text } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,6 +10,8 @@ export function MainLinks() {
     {
       [
         { icon: <FileDiff size={16} />, color: 'orange', label: 'Simple difference', url: '/simple-difference' },
+        { icon: <FileCertificate size={16} />, color: 'yellow', label: 'Deep analyze', url: '/deep-analyze' },
+        { icon: <History size={16} />, color: 'teal', label: 'History', url: '/history' },
         { icon: <Settings size={16} />, color: 'green', label: 'Settings', url: '/settings' },
       ]
         .map(({ icon, color, label, url }) => <UnstyledButton
