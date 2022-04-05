@@ -4,12 +4,14 @@ import { Main } from './main/main';
 import { Login } from './login/login';
 import { Settings } from './settings/settings';
 import { withAuth } from './HOC/auth';
+import { SimpleDifference } from './simpleDifference/simpleDifference';
 
 // const StyledApp = styled.div`
 //   // Your style here
 // `;
 
 const AuthSettings = withAuth(Settings);
+const AuthSimpleDifference = withAuth(SimpleDifference);
 
 export function App() {
   return (
@@ -18,6 +20,7 @@ export function App() {
       <Route path='/login' element={<Login />} />
       <Route path='/register' element={<Login />} />
       <Route path='/settings' element={<AuthSettings />} />
+      <Route path='/simple-difference' element={<AuthSimpleDifference />} />
     </Routes>
   );
 }
