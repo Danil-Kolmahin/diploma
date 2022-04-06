@@ -15,6 +15,7 @@ import {
 import { Lock, Mail } from 'tabler-icons-react';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { gql, useMutation } from '@apollo/client';
+import { APP_THEMES, DEFAULT_REDIRECT_ROUTE, ROUTES } from '@diploma-v2/common/constants-common';
 
 const CREATE_NEW_USER = gql`
   mutation createUser (
@@ -72,7 +73,7 @@ export const Login = () => {
 
     const toggleFormType = () => {
       setError('');
-      navigate(isRegister ? '/login' : '/register');
+      navigate(isRegister ? ROUTES.LOGIN : ROUTES.REGISTER);
     };
 
     const [createUser] = useMutation(CREATE_NEW_USER);
@@ -88,7 +89,7 @@ export const Login = () => {
         await login({
           variables: { email: values.email, password: values.password },
         });
-        navigate('/settings');
+        navigate(DEFAULT_REDIRECT_ROUTE);
       } catch (e: any) {
         setError(e.message ? e.message : 'Server error');
       }
@@ -107,7 +108,7 @@ export const Login = () => {
           shadow={'sm'}
           style={{
             maxWidth: 400,
-            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
+            backgroundColor: theme.colorScheme === APP_THEMES.DARK ? theme.colors.dark[7] : theme.white,
           }}
         >
           <form onSubmit={form.onSubmit(handleSubmit)}>

@@ -4,6 +4,7 @@ import { MainLinks } from '../_mainLinks';
 import { Logo } from '../_logo';
 import { User } from '../_user';
 import { MoonStars, Sun } from 'tabler-icons-react';
+import { APP_THEMES } from '@diploma-v2/common/constants-common';
 
 export const Settings = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
@@ -28,7 +29,7 @@ export const Settings = ({ parsedCookie }: any) => {
     >
 
       <ActionIcon variant='default' onClick={() => toggleColorScheme()} size={30}>
-        {colorScheme === 'dark' ? <Sun size={16} /> : <MoonStars size={16} />}
+        {colorScheme === APP_THEMES.DARK ? <Sun size={16} /> : <MoonStars size={16} />}
       </ActionIcon>
 
     </AppShell>

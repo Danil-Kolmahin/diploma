@@ -3,6 +3,7 @@ import { Buffer } from 'buffer';
 import { Navigate } from 'react-router-dom';
 import { isObject, parseCookies } from '@diploma-v2/common/utils-common';
 import { CookieTokenDataI } from '@diploma-v2/common/types-common';
+import { ROUTES } from '@diploma-v2/common/constants-common';
 
 const parseJwt = (token: string) => {
   const [, base64Payload] = token.split('.');
@@ -11,7 +12,7 @@ const parseJwt = (token: string) => {
 };
 
 const EMPTY_COOKIES: CookieTokenDataI = {
-  id: '12345678-1234-1234-12345678',
+  id: '01234567-0123-0123-0123-01234567',
   email: 'unknown@email.com',
   exp: 0,
   iat: 0,
@@ -92,6 +93,6 @@ export const withAuth = (WrappedComponent: React.ComponentType, shouldAuth = tru
       // @ts-ignore
       return <WrappedComponent {...props} parsedCookie={cookie} />;
     }
-    return <Navigate to={'/login'} />;
+    return <Navigate to={ROUTES.LOGIN} />;
   };
 };

@@ -11,6 +11,7 @@ import { Logo } from '../_logo';
 import { User } from '../_user';
 import React, { useRef, useState } from 'react';
 import { Dropzone } from '@mantine/dropzone';
+import { APP_THEMES } from '@diploma-v2/common/constants-common';
 
 export const SimpleDifference = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
@@ -44,7 +45,7 @@ export const SimpleDifference = ({ parsedCookie }: any) => {
           align='center'
           size='xl'
           weight={700}
-          color={theme.colorScheme === 'dark' ? '#fff' : '#000'}
+          color={theme.colorScheme === APP_THEMES.DARK ? '#fff' : '#000'}
         >
           Comparing two texts
         </Text>

@@ -3,6 +3,7 @@ import { AppShell, Group, Header, Navbar, useMantineTheme, Title } from '@mantin
 import { MainLinks } from '../_mainLinks';
 import { Logo } from '../_logo';
 import { User } from '../_user';
+import { APP_THEMES } from '@diploma-v2/common/constants-common';
 
 export const NotFound = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
@@ -33,12 +34,12 @@ export const NotFound = ({ parsedCookie }: any) => {
           order={1}
           align='center'
           style={{
-            color: theme.colorScheme === 'dark' ? '#fff' : '#000',
+            color: theme.colorScheme === APP_THEMES.DARK ? '#fff' : '#000',
             width: '100%',
             fontSize: 80,
             display: 'inline-block',
             verticalAlign: 'middle',
-        }}
+          }}
         >
           404 not found
         </Title>

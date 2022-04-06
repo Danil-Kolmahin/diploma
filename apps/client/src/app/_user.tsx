@@ -4,6 +4,7 @@ import { UnstyledButton, Group, Avatar, Text, Box, useMantineTheme } from '@mant
 import { useNavigate } from 'react-router-dom';
 import { gql, useMutation } from '@apollo/client';
 import { convertToHex } from '@diploma-v2/common/utils-common';
+import { APP_THEMES, ROUTES } from '@diploma-v2/common/constants-common';
 
 const LOGOUT = gql`
   mutation logout {
@@ -23,7 +24,7 @@ export const User = ({ parsedCookie: { email, id } }: any) => {
     <Box
       sx={{
         borderTop: `1px solid ${
-          theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[2]
+          theme.colorScheme === APP_THEMES.DARK ? theme.colors.dark[4] : theme.colors.gray[2]
         }`,
       }}
     >
@@ -33,16 +34,16 @@ export const User = ({ parsedCookie: { email, id } }: any) => {
           width: '100%',
           padding: theme.spacing.xs,
           borderRadius: theme.radius.sm,
-          color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
+          color: theme.colorScheme === APP_THEMES.DARK ? theme.colors.dark[0] : theme.black,
 
           '&:hover': {
             backgroundColor:
-              theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+              theme.colorScheme === APP_THEMES.DARK ? theme.colors.dark[6] : theme.colors.gray[0],
           },
         }}
         onClick={async () => {
           await logout();
-          !logoutLoading && !logoutError && navigate('/login');
+          !logoutLoading && !logoutError && navigate(ROUTES.LOGIN);
         }}
       >
         <Group>
