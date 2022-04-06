@@ -9,6 +9,7 @@ import { NotFound } from './notFound/notFound';
 import { useState } from 'react';
 import { MantineProvider, ColorSchemeProvider, ColorScheme, Global } from '@mantine/core';
 import { APP_THEMES, DEFAULT_APP_THEME, ROUTES, SESSION_STORAGE } from '@diploma-v2/common/constants-common';
+import { getPreferredColorScheme } from '@diploma-v2/frontend/utils-frontend';
 
 // const StyledApp = styled.div`
 //   // Your style here
@@ -20,7 +21,9 @@ const AuthNotFound = withAuth(NotFound);
 
 export function App() {
   const [colorScheme, setColorScheme] = useState<ColorScheme>(() => {
-    return sessionStorage.getItem(SESSION_STORAGE.APP_THEME) as ColorScheme || DEFAULT_APP_THEME;
+    return sessionStorage.getItem(SESSION_STORAGE.APP_THEME) as ColorScheme
+      || getPreferredColorScheme()
+      || DEFAULT_APP_THEME;
   });
   const toggleColorScheme = (value?: ColorScheme) => {
     const newColorScheme = value || (

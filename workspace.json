@@ -6,6 +6,7 @@
 		"common-constants-common": "libs/common/constants-common",
 		"common-types-common": "libs/common/types-common",
 		"common-utils-common": "libs/common/utils-common",
+		"frontend-utils-frontend": "libs/frontend/utils-frontend",
 		"server": "apps/server"
 	}
 }

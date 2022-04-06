@@ -1,0 +1,23 @@
+{
+	"root": "libs/frontend/utils-frontend",
+	"sourceRoot": "libs/frontend/utils-frontend/src",
+	"projectType": "library",
+	"targets": {
+		"lint": {
+			"executor": "@nrwl/linter:eslint",
+			"outputs": ["{options.outputFile}"],
+			"options": {
+				"lintFilePatterns": ["libs/frontend/utils-frontend/**/*.ts"]
+			}
+		},
+		"test": {
+			"executor": "@nrwl/jest:jest",
+			"outputs": ["coverage/libs/frontend/utils-frontend"],
+			"options": {
+				"jestConfig": "libs/frontend/utils-frontend/jest.config.js",
+				"passWithNoTests": true
+			}
+		}
+	},
+	"tags": []
+}

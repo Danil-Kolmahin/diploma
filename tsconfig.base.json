@@ -23,6 +23,9 @@
 			],
 			"@diploma-v2/common/utils-common": [
 				"libs/common/utils-common/src/index.ts"
+			],
+			"@diploma-v2/frontend/utils-frontend": [
+				"libs/frontend/utils-frontend/src/index.ts"
 			]
 		}
 	},
