@@ -16,3 +16,7 @@ export enum ROUTES {
 }
 
 export const DEFAULT_REDIRECT_ROUTE = ROUTES.SIMPLE_DIFF;
+
+export enum SESSION_STORAGE {
+  APP_THEME = 'DIPLOMA_V2_APP_THEME',
+}
