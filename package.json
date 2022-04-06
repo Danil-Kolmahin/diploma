@@ -88,6 +88,7 @@
 		"reflect-metadata": "^0.1.13",
 		"regenerator-runtime": "0.13.7",
 		"rxjs": "^7.0.0",
+		"string-mismatch": "^2.1.1",
 		"tabler-icons-react": "^1.41.0",
 		"tslib": "^2.0.0",
 		"typeorm": "^0.2.45"

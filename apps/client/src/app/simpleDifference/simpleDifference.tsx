@@ -5,6 +5,7 @@ import {
   useAccordionState,
   Grid,
   Center,
+  Highlight,
 } from '@mantine/core';
 import { MainLinks } from '../_mainLinks';
 import { Logo } from '../_logo';
@@ -12,12 +13,26 @@ import { User } from '../_user';
 import React, { useRef, useState } from 'react';
 import { Dropzone } from '@mantine/dropzone';
 import { APP_THEMES } from '@diploma-v2/common/constants-common';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { Greedy } from 'string-mismatch';
+
+function getBase64(file: File) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
 
 export const SimpleDifference = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
   const [state, handlers] = useAccordionState({ total: 2, initialItem: 0 });
   const [firstText, setFirstText] = useState('');
   const [secondText, setSecondText] = useState('');
+  const [highlight, setHighlight] = useState<string[]>([]);
+  const [isCompared, setIsCompared] = useState(false);
   const openRef = useRef<() => void>();
 
   return <AppShell
@@ -53,7 +68,17 @@ export const SimpleDifference = ({ parsedCookie }: any) => {
 
       {Object.values(state).some(Boolean) && <>
         <Grid.Col span={3}><Center>
-          <Button color={'green'} onClick={() => ({})}>
+          <Button color={'green'} onClick={() => {
+            const differences = (new Greedy()).differences(firstText, secondText);
+            const newHighlights: string[] = [];
+            (differences).forEach(({type, value}: {type: string, value: string}) => {
+              if (type !== 'eql') return;
+              if (value.split(/\s/).length < 8) return;
+              newHighlights.push(value);
+            })
+            setHighlight(newHighlights)
+            setIsCompared(true);
+          }}>
             Compare
           </Button>
         </Center></Grid.Col>
@@ -72,7 +97,13 @@ export const SimpleDifference = ({ parsedCookie }: any) => {
         </Center></Grid.Col>
 
         <Grid.Col span={3}><Center>
-          <Dropzone onDrop={(...a) => (console.log(a))} openRef={openRef as any} style={{ display: 'none' }}>
+          <Dropzone onDrop={async (files) => {
+            const result = (await Promise.all(files
+              .map(async (file) => await getBase64(file))))
+              .join('\n');
+            if (state[0]) setFirstText(firstText + result);
+            if (state[1]) setSecondText(secondText + result);
+          }} openRef={openRef as any} style={{ display: 'none' }}>
             {() => <div>Select files</div>}
           </Dropzone>
           <Button onClick={() => (openRef as any).current()}>Select files</Button>
@@ -91,27 +122,41 @@ export const SimpleDifference = ({ parsedCookie }: any) => {
       <Grid.Col span={12}>
         <Accordion state={state} onChange={handlers.setState} iconPosition='right'>
 
+
           <Accordion.Item label='First text'>
-            <Textarea
-              variant={'default'}
-              value={firstText}
-              autosize
-              minRows={10}
-              maxRows={10}
-              onChange={(event) => setFirstText(event.currentTarget.value)}
-            />
+            {isCompared ?
+              <Highlight
+                highlight={highlight} onClick={() => isCompared && setIsCompared(false)}
+              >{firstText}</Highlight>
+              :
+              <Textarea
+                variant={'default'}
+                autosize
+                value={firstText}
+                minRows={10}
+                maxRows={10}
+                onChange={(event) => setFirstText(event.currentTarget.value)}
+              />
+            }
           </Accordion.Item>
 
           <Accordion.Item label='Second text'>
-            <Textarea
-              variant={'default'}
-              value={secondText}
-              autosize
-              minRows={10}
-              maxRows={10}
-              onChange={(event) => setSecondText(event.currentTarget.value)}
-            />
+            {isCompared ?
+              <Highlight
+                highlight={highlight} onClick={() => isCompared && setIsCompared(false)}
+              >{secondText}</Highlight>
+              :
+              <Textarea
+                variant={'default'}
+                value={secondText}
+                autosize
+                minRows={10}
+                maxRows={10}
+                onChange={(event) => setSecondText(event.currentTarget.value)}
+              />
+            }
           </Accordion.Item>
+
 
         </Accordion>
       </Grid.Col>
