@@ -4,6 +4,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { AuthModule } from './auth/auth.module';
       synchronize: true,
       logging: false,
       autoLoadEntities: true,
-      entities: [ __dirname + 'dist/**/*.entity{.ts,.js}' ],
+      entities: [__dirname + 'dist/**/*.entity{.ts,.js}'],
       // entities: [UserEntity],
     }),
     GraphQLModule.forRoot({
@@ -37,10 +38,11 @@ import { AuthModule } from './auth/auth.module';
       cors: {
         credentials: true,
         origin: `${process.env.NX_API_PROTOCOL}://${process.env.NX_API_HOST}`,
-      }
+      },
     }),
     UsersModule,
     AuthModule,
+    FilesModule,
   ],
   providers: [],
 })

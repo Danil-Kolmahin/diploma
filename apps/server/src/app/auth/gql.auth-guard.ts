@@ -17,9 +17,8 @@ export const Auth = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
     const gqlCtx = GqlExecutionContext.create(context);
     const request = gqlCtx.getContext().req;
-    const token = parseCookies(
-      request.headers.cookie,
-    )[process.env.NX_AUTH_COOKIE_NAME];
+    const cookie = request.headers.cookie;
+    const token = parseCookies(cookie)[process.env.NX_AUTH_COOKIE_NAME];
     return jwt.decode(token); // maybe service better?
   },
 );
@@ -33,15 +32,11 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const gqlCtx = GqlExecutionContext.create(context);
     const request = gqlCtx.getContext().req;
-
-    const token = parseCookies(
-      request.headers.cookie,
-    )[process.env.NX_AUTH_COOKIE_NAME];
-
+    const cookie = request.headers.cookie;
+    if (!cookie) throw new UnauthorizedException();
+    const token = parseCookies(cookie)[process.env.NX_AUTH_COOKIE_NAME];
     const data = await this.authService.parseToken(token) as CookieTokenDataI;
-
     if (!data || data.exp * 1000 <= Date.now()) throw new UnauthorizedException();
-
     return true;
   }
 }
