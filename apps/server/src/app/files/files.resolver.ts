@@ -30,21 +30,14 @@ export class FilesResolver {
     return file;
   }
 
-  // @Mutation(() => FilesEntity)
-  // @UseGuards(GqlAuthGuard)
-  // async saveFile(
-  //   @Args('', new ValidationPipe()) file: BaseFileArgs,
-  // ): Promise<FilesEntity> {
-  //   return this.filesService.createOne(file);
-  // }
-
-  @Mutation(() => Boolean)
+  @Mutation(() => FilesEntity)
   @UseGuards(GqlAuthGuard)
   async saveFile(
     @Args('file', { type: () => GraphQLUpload }) file: FileUpload,
-  ) {
+  ): Promise<FilesEntity> {
     const data = await streamToBuffer(file.createReadStream());
-    await this.filesService.createOne({ ...file, data });
-    return true;
+    const savedFile = await this.filesService.createOne({ ...file, data });
+    if (savedFile.data) savedFile.data = savedFile.data.toString();
+    return savedFile;
   }
 }
