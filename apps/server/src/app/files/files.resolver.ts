@@ -4,16 +4,7 @@ import { GqlAuthGuard } from '../auth/gql.auth-guard';
 import { FilesService } from './files.service';
 import { FilesEntity } from './files.entity';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
-import { Stream } from 'stream';
-
-const streamToBuffer = async (stream: Stream): Promise<Buffer> => new Promise<Buffer>(
-  (resolve, reject) => {
-    const _buf = Array<any>();
-    stream.on('data', chunk => _buf.push(chunk));
-    stream.on('end', () => resolve(Buffer.concat(_buf)));
-    stream.on('error', err => reject(`error converting stream - ${err}`));
-  },
-);
+import { streamToBuffer } from '@diploma-v2/backend/utils-backend';
 
 @Resolver('files')
 export class FilesResolver {

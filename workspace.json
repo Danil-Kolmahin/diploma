@@ -1,6 +1,7 @@
 {
 	"version": 2,
 	"projects": {
+		"backend-utils-backend": "libs/backend/utils-backend",
 		"client": "apps/client",
 		"client-e2e": "apps/client-e2e",
 		"common-constants-common": "libs/common/constants-common",
