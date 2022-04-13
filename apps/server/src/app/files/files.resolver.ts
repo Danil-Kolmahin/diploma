@@ -1,23 +1,19 @@
-import { Args, ArgsType, Field, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { CommonEntity } from '../common/common.entity';
-import { UseGuards, ValidationPipe } from '@nestjs/common';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../auth/gql.auth-guard';
 import { FilesService } from './files.service';
 import { FilesEntity } from './files.entity';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { GraphQLUpload, FileUpload } from 'graphql-upload';
+import { Stream } from 'stream';
 
-@ArgsType()
-class BaseFileArgs implements Omit<FilesEntity, keyof CommonEntity> {
-  @Field()
-  @IsString()
-  @IsNotEmpty()
-  filename: string;
-
-  @Field()
-  @IsString()
-  @IsNotEmpty()
-  data: string;
-}
+const streamToBuffer = async (stream: Stream): Promise<Buffer> => new Promise<Buffer>(
+  (resolve, reject) => {
+    const _buf = Array<any>();
+    stream.on('data', chunk => _buf.push(chunk));
+    stream.on('end', () => resolve(Buffer.concat(_buf)));
+    stream.on('error', err => reject(`error converting stream - ${err}`));
+  },
+);
 
 @Resolver('files')
 export class FilesResolver {
@@ -34,11 +30,21 @@ export class FilesResolver {
     return file;
   }
 
-  @Mutation(() => FilesEntity)
+  // @Mutation(() => FilesEntity)
+  // @UseGuards(GqlAuthGuard)
+  // async saveFile(
+  //   @Args('', new ValidationPipe()) file: BaseFileArgs,
+  // ): Promise<FilesEntity> {
+  //   return this.filesService.createOne(file);
+  // }
+
+  @Mutation(() => Boolean)
   @UseGuards(GqlAuthGuard)
   async saveFile(
-    @Args('', new ValidationPipe()) file: BaseFileArgs,
-  ): Promise<FilesEntity> {
-    return this.filesService.createOne(file);
+    @Args('file', { type: () => GraphQLUpload }) file: FileUpload,
+  ) {
+    const data = await streamToBuffer(file.createReadStream());
+    await this.filesService.createOne({ ...file, data });
+    return true;
   }
 }

@@ -10,6 +10,14 @@ export class FilesEntity extends CommonEntity {
   filename: string;
 
   @Field()
+  @Column({ type: 'varchar' })
+  mimetype: string;
+
+  @Field()
+  @Column({ type: 'varchar' })
+  encoding: string;
+
+  @Field()
   @Column({ type: 'bytea' })
   data: string;
 }
