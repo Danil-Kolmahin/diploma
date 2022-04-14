@@ -31,4 +31,19 @@ export class FilesResolver {
     if (savedFile && savedFile.data) savedFile.data = savedFile.data.toString();
     return savedFile;
   }
+
+  @Mutation(() => [FilesEntity])
+  @UseGuards(GqlAuthGuard)
+  async saveFiles(
+    @Args('files', { type: () => [GraphQLUpload] }) files: FileUpload[],
+  ): Promise<FilesEntity[]> {
+    const savedFiles = [];
+    for await (const file of files) {
+      const data = await streamToBuffer(file.createReadStream());
+      const savedFile = await this.filesService.createOne({ ...file, data });
+      if (savedFile && savedFile.data) savedFile.data = savedFile.data.toString();
+      savedFiles.push(savedFile);
+    }
+    return savedFiles;
+  }
 }
