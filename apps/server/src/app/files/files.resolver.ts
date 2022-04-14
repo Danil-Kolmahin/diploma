@@ -17,7 +17,7 @@ export class FilesResolver {
   @UseGuards(GqlAuthGuard)
   async findFileById(@Args('id') id: string): Promise<FilesEntity | undefined> {
     const file = await this.filesService.findOneById(id);
-    if (file.data) file.data = file.data.toString();
+    if (file && file.data) file.data = file.data.toString();
     return file;
   }
 
@@ -28,7 +28,7 @@ export class FilesResolver {
   ): Promise<FilesEntity> {
     const data = await streamToBuffer(file.createReadStream());
     const savedFile = await this.filesService.createOne({ ...file, data });
-    if (savedFile.data) savedFile.data = savedFile.data.toString();
+    if (savedFile && savedFile.data) savedFile.data = savedFile.data.toString();
     return savedFile;
   }
 }
