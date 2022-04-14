@@ -27,7 +27,9 @@ export class FilesResolver {
     @Args('file', { type: () => GraphQLUpload }) file: FileUpload,
   ): Promise<FilesEntity> {
     const data = await streamToBuffer(file.createReadStream());
-    const savedFile = await this.filesService.createOne({ ...file, data });
+    const savedFile = await this.filesService.createOne({
+      ...file, data, byteLength: Buffer.byteLength(data),
+    });
     if (savedFile && savedFile.data) savedFile.data = savedFile.data.toString();
     return savedFile;
   }
@@ -40,7 +42,9 @@ export class FilesResolver {
     const savedFiles = [];
     for await (const file of files) {
       const data = await streamToBuffer(file.createReadStream());
-      const savedFile = await this.filesService.createOne({ ...file, data });
+      const savedFile = await this.filesService.createOne({
+        ...file, data, byteLength: Buffer.byteLength(data),
+      });
       if (savedFile && savedFile.data) savedFile.data = savedFile.data.toString();
       savedFiles.push(savedFile);
     }

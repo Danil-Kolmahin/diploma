@@ -20,4 +20,8 @@ export class FilesEntity extends CommonEntity {
   @Field()
   @Column({ type: 'bytea' })
   data: string;
+
+  @Field()
+  @Column({ type: 'integer' })
+  byteLength: number;
 }
