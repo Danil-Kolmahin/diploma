@@ -3,13 +3,13 @@ import {
   Button,
   MultiSelect,
   ActionIcon,
-  Box, TextInput, Chip, Chips,
+  TextInput, Chip, Chips, Grid, Center,
 } from '@mantine/core';
 import { MainLinks } from '../_mainLinks';
 import { Logo } from '../_logo';
 import { User } from '../_user';
 import React, { useRef, useState } from 'react';
-import { Files, Trash } from 'tabler-icons-react';
+import { Files, File, Folder, NewSection, Trash } from 'tabler-icons-react';
 import { formList, useForm } from '@mantine/form';
 import { renameFile } from '@diploma-v2/frontend/utils-frontend';
 
@@ -48,28 +48,30 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
       </Header>
     }
   >
-    <Box mx='auto'>
-      <Button
+    <Grid justify='space-around'>
+      <Grid.Col span={3}><Center><Button
+        color={'green'}
         onClick={() => console.log(form.values.projects)}
       >
         Compare
-      </Button>
+      </Button></Center></Grid.Col>
 
-      <Button
+      <Grid.Col span={3}><Center><Button
+        leftIcon={isFileSearch ? <Folder /> : <File />}
         onClick={() => setIsFileSearch(!isFileSearch)}
       >
         {isFileSearch ? 'Search for folders' : 'Search for files'}
-      </Button>
+      </Button></Center></Grid.Col>
 
-      <Chips multiple {...form.getInputProps('fileTypes')}>
+      <Grid.Col span={6}><Center><Chips multiple {...form.getInputProps('fileTypes')}>
         {Object.entries(POSSIBLE_FILE_TYPES).map(
           ([key]) => <Chip key={key} value={key}>
             {key}
           </Chip>,
         )}
-      </Chips>
+      </Chips></Center></Grid.Col>
 
-      {form.values.projects.map((_, index) => (
+      <Grid.Col span={12}>{form.values.projects.map((_, index) => (
         <Group key={index} mt='xs'>
           <TextInput
             placeholder='Project name'
@@ -92,10 +94,10 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
               if (element !== null) {
                 if (isFileSearch) {
                   element.removeAttribute('directory');
-                  element.removeAttribute('webkitdirectory');
+                  element.removeAttribute('webkitDirectory');
                 } else {
                   element.setAttribute('directory', '');
-                  element.setAttribute('webkitdirectory', '');
+                  element.setAttribute('webkitDirectory', '');
                 }
               }
               return refs.current[index] = element as never;
@@ -154,18 +156,19 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
             <Trash size={16} />
           </ActionIcon>
         </Group>
-      ))}
+      ))}</Grid.Col>
 
-      <Group position='center' mt='md'>
-        <Button onClick={() => form.addListItem('projects', {
+      <Grid.Col span={3}><Center><Button
+        leftIcon={<NewSection />}
+        onClick={() => form.addListItem('projects', {
           name: `Project #${form.values.projects.length + 1}`,
           creatorName: 'unknown',
           files: [],
-        })}>
-          Add project to compare
-        </Button>
-      </Group>
-    </Box>
+        })}
+      >
+        Add project to compare
+      </Button></Center></Grid.Col>
+    </Grid>
 
   </AppShell>;
 };
