@@ -104,25 +104,25 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
             }}
             onChange={async ({ target: { files } }) => {
               const checkRegEx = new RegExp(
-                `([.](${form.values.fileTypes.map(
-              (type) => POSSIBLE_FILE_TYPES[type].map((t: string) => t.slice(1)).join('|'),
-            ).join('|')}))$`,
+                `([.](${
+                  form.values.fileTypes.map(
+                    (type) => POSSIBLE_FILE_TYPES[type].map(
+                      (t: string) => t.slice(1),
+                    ).join('|'),
+                  ).join('|')
+                }))$`,
               );
               form.setValues((prevState) => {
                 if (!files || !files.length) return prevState;
                 for (let i = 0; i < files.length; i++) {
                   let file = files[i];
                   if (!checkRegEx.test(file.name)) continue;
-                  if (prevState.projects[index].files.find(
-                    ({ name }) => name === file.name,
-                  )) {
-                    let num = 1;
-                    const findMore = (num: number) => prevState.projects[index].files.find(
-                      ({ name }) => name === `(${num})${file.name}`,
-                    );
-                    while (findMore(num)) num++;
-                    file = renameFile(file, `(${num})${file.name}`);
-                  }
+                  let num = 0;
+                  const findMore = (num: number) => prevState.projects[index].files.find(
+                    ({ name }) => name === `${num ? `(${num})` : ''}${file.name}`,
+                  );
+                  while (findMore(num)) num++;
+                  if (num) file = renameFile(file, `(${num})${file.name}`);
                   prevState.projects[index].files.push(file);
                 }
                 return prevState;
