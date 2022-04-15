@@ -3,25 +3,24 @@ import {
   Button,
   MultiSelect,
   ActionIcon,
-  Box, TextInput,
+  Box, TextInput, Chip, Chips,
 } from '@mantine/core';
 import { MainLinks } from '../_mainLinks';
 import { Logo } from '../_logo';
 import { User } from '../_user';
 import React, { useRef, useState } from 'react';
-import { Check, Files, Trash } from 'tabler-icons-react';
+import { Files, Trash } from 'tabler-icons-react';
 import { formList, useForm } from '@mantine/form';
-import { useNotifications } from '@mantine/notifications';
+import { renameFile } from '@diploma-v2/frontend/utils-frontend';
 
-const renameFile = (originalFile: File, newName: string) => new File(
-  [originalFile], newName, originalFile,
-);
+const POSSIBLE_FILE_TYPES = {
+  'JavaScript': ['.js', '.jsx'],
+  'TypeScript': ['.ts', '.tsx'],
+};
 
 export const DeepAnalyze = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
   const [isFileSearch, setIsFileSearch] = useState(true);
-
-  const { showNotification, updateNotification } = useNotifications();
 
   const form = useForm({
     initialValues: {
@@ -29,6 +28,7 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
         { name: 'Project #1', creatorName: 'unknown', files: [] },
         { name: 'Project #2', creatorName: 'unknown', files: [] },
       ]),
+      fileTypes: Object.keys(POSSIBLE_FILE_TYPES),
     },
   });
   const refs = useRef([]);
@@ -49,18 +49,6 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
       </Header>
     }
   >
-    {/*<Grid justify='space-around'>*/}
-
-    {/*  <Grid.Col span={6}><Center>*/}
-    {/*    <Button>Compare</Button>*/}
-    {/*  </Center></Grid.Col>*/}
-
-    {/*  <Grid.Col span={6}><Center>*/}
-    {/*    <Button>Add one more project to compare</Button>*/}
-    {/*  </Center></Grid.Col>*/}
-
-    {/*</Grid>*/}
-
     <Box mx='auto'>
       <Button
         onClick={() => console.log(form.values.projects)}
@@ -73,6 +61,13 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
       >
         {isFileSearch ? 'Search for folders' : 'Search for files'}
       </Button>
+
+      <Chips multiple {...form.getInputProps('fileTypes')}>
+        {Object.entries(POSSIBLE_FILE_TYPES)
+          .map(([key]) => <Chip key={key} value={key}>
+            {key}
+          </Chip>)}
+      </Chips>
 
       {form.values.projects.length > 0 ? (
         <Group mb='xs'>
@@ -106,47 +101,46 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
             ref={(element) => {
               if (element !== null) {
                 if (isFileSearch) {
-                  (element as any).removeAttribute('directory');
-                  (element as any).removeAttribute('webkitdirectory');
+                  element.removeAttribute('directory');
+                  element.removeAttribute('webkitdirectory');
                 } else {
-                  (element as any).setAttribute('directory', '');
-                  (element as any).setAttribute('webkitdirectory', '');
+                  element.setAttribute('directory', '');
+                  element.setAttribute('webkitdirectory', '');
                 }
               }
               return refs.current[index] = element as never;
             }}
+            accept={form.values.fileTypes.map(
+              (type) => (POSSIBLE_FILE_TYPES as any)[type].join(', '),
+            ).join(', ')}
             style={{ display: 'none' }}
             multiple
             onChange={async ({ target: { files } }) => {
-              // showNotification({
-              //   id: `inputFile${index}`,
-              //   message: 'Loading...',
-              // });
+              const checkRegEx = new RegExp(
+                `([.](${form.values.fileTypes.map(
+              (type) => (POSSIBLE_FILE_TYPES as any)[type].map((t: string) => t.slice(1)).join('|'),
+            ).join('|')}))$`,
+              );
               form.setValues((prevState) => {
                 if (!files || !files.length) return prevState;
                 for (let i = 0; i < files.length; i++) {
                   let file = files[i];
+                  if (!checkRegEx.test(file.name)) continue;
                   if (prevState.projects[index].files.find(
                     ({ name }) => name === file.name,
                   )) {
                     let num = 1;
                     const findMore = (num: number) => prevState.projects[index].files.find(
-                      ({ name }) => name === `${file.name} (${num})`,
+                      ({ name }) => name === `(${num})${file.name}`,
                     );
                     while (findMore(num)) num++;
-                    file = renameFile(file, `${file.name} (${num})`);
+                    file = renameFile(file, `(${num})${file.name}`);
                   }
                   prevState.projects[index].files.push(file);
                 }
                 return prevState;
               });
               form.clearErrors();
-              // updateNotification(`inputFile${index}`, {
-              //   color: 'teal',
-              //   message: 'Loading succeed!',
-              //   icon: <Check />,
-              //   autoClose: 1000,
-              // });
             }}
           />
           <MultiSelect
@@ -156,7 +150,7 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
             data={form
               .getListInputProps('projects', index, 'files')
               .value.map(
-                (file: File, i: number) => ({ value: file.name, label: file.name }),
+                (file: File) => ({ value: file.name, label: file.name }),
               )
             }
             value={form
