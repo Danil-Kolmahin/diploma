@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { MantineProvider, ColorSchemeProvider, ColorScheme, Global } from '@mantine/core';
 import { APP_THEMES, DEFAULT_APP_THEME, ROUTES, SESSION_STORAGE } from '@diploma-v2/common/constants-common';
 import { getPreferredColorScheme } from '@diploma-v2/frontend/utils-frontend';
+import { DeepAnalyze } from './deepAnalyze/deepAnalyze';
 
 // const StyledApp = styled.div`
 //   // Your style here
@@ -17,6 +18,7 @@ import { getPreferredColorScheme } from '@diploma-v2/frontend/utils-frontend';
 
 const AuthSettings = withAuth(Settings);
 const AuthSimpleDifference = withAuth(SimpleDifference);
+const AuthDeepAnalyze = withAuth(DeepAnalyze);
 const AuthNotFound = withAuth(NotFound);
 
 export function App() {
@@ -51,6 +53,7 @@ export function App() {
           <Route path={ROUTES.REGISTER} element={<Login />} />
           <Route path={ROUTES.SETTINGS} element={<AuthSettings />} />
           <Route path={ROUTES.SIMPLE_DIFF} element={<AuthSimpleDifference />} />
+          <Route path={ROUTES.DEEP_ANALYZE} element={<AuthDeepAnalyze />} />
           <Route path={'*'} element={<AuthNotFound />} />
         </Routes>
       </MantineProvider>

@@ -13,7 +13,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
-  app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
+  app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 100 }));
   const port = process.env.NX_API_PORT || 3333;
   await app.listen(port);
   Logger.log(
