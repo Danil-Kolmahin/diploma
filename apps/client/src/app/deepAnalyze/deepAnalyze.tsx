@@ -1,5 +1,5 @@
 import {
-  AppShell, Group, Header, Navbar, useMantineTheme, Text,
+  AppShell, Group, Header, Navbar, useMantineTheme,
   Button,
   MultiSelect,
   ActionIcon,
@@ -13,15 +13,15 @@ import { Files, Trash } from 'tabler-icons-react';
 import { formList, useForm } from '@mantine/form';
 import { renameFile } from '@diploma-v2/frontend/utils-frontend';
 
-const POSSIBLE_FILE_TYPES = {
+const POSSIBLE_FILE_TYPES: { [key: string]: string[] } = {
   'JavaScript': ['.js', '.jsx'],
   'TypeScript': ['.ts', '.tsx'],
 };
 
 export const DeepAnalyze = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
+  const refs = useRef([]);
   const [isFileSearch, setIsFileSearch] = useState(true);
-
   const form = useForm({
     initialValues: {
       projects: formList<{ name: string, creatorName: string, files: File[] }>([
@@ -31,7 +31,6 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
       fileTypes: Object.keys(POSSIBLE_FILE_TYPES),
     },
   });
-  const refs = useRef([]);
 
   return <AppShell
     fixed
@@ -63,26 +62,12 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
       </Button>
 
       <Chips multiple {...form.getInputProps('fileTypes')}>
-        {Object.entries(POSSIBLE_FILE_TYPES)
-          .map(([key]) => <Chip key={key} value={key}>
+        {Object.entries(POSSIBLE_FILE_TYPES).map(
+          ([key]) => <Chip key={key} value={key}>
             {key}
-          </Chip>)}
+          </Chip>,
+        )}
       </Chips>
-
-      {form.values.projects.length > 0 ? (
-        <Group mb='xs'>
-          <Text weight={500} size='sm' sx={{ flex: 1 }}>
-            Name
-          </Text>
-          <Text weight={500} size='sm' pr={90}>
-            Status
-          </Text>
-        </Group>
-      ) : (
-        <Text color='dimmed' align='center'>
-          No one here...
-        </Text>
-      )}
 
       {form.values.projects.map((_, index) => (
         <Group key={index} mt='xs'>
@@ -98,6 +83,11 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
           />
           <input
             type='file'
+            multiple
+            style={{ display: 'none' }}
+            accept={form.values.fileTypes.map(
+              (type) => POSSIBLE_FILE_TYPES[type].join(', '),
+            ).join(', ')}
             ref={(element) => {
               if (element !== null) {
                 if (isFileSearch) {
@@ -110,15 +100,10 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
               }
               return refs.current[index] = element as never;
             }}
-            accept={form.values.fileTypes.map(
-              (type) => (POSSIBLE_FILE_TYPES as any)[type].join(', '),
-            ).join(', ')}
-            style={{ display: 'none' }}
-            multiple
             onChange={async ({ target: { files } }) => {
               const checkRegEx = new RegExp(
                 `([.](${form.values.fileTypes.map(
-              (type) => (POSSIBLE_FILE_TYPES as any)[type].map((t: string) => t.slice(1)).join('|'),
+              (type) => POSSIBLE_FILE_TYPES[type].map((t: string) => t.slice(1)).join('|'),
             ).join('|')}))$`,
               );
               form.setValues((prevState) => {
@@ -146,6 +131,8 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
           <MultiSelect
             placeholder='Pick project files'
             clearable
+            icon={<Files />}
+            style={{ maxWidth: '60%', minWidth: '30%' }}
             {...form.getListInputProps('projects', index, 'files')}
             data={form
               .getListInputProps('projects', index, 'files')
@@ -156,13 +143,12 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
             value={form
               .getListInputProps('projects', index, 'files')
               .value.map((file: File) => file.name)}
-            icon={<Files />}
-            onDropdownOpen={() => (refs as any).current[index].click()}
-            style={{ maxWidth: '60%', minWidth: '30%' }}
+            onDropdownOpen={() => (refs.current[index] as HTMLInputElement).click()}
           />
           <ActionIcon
             color='red'
             variant='hover'
+            disabled={form.values.projects.length <= 2}
             onClick={() => form.removeListItem('projects', index)}
           >
             <Trash size={16} />
