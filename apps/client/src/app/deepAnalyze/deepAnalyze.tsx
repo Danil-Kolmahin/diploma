@@ -3,18 +3,25 @@ import {
   Button,
   MultiSelect,
   ActionIcon,
-   Box, TextInput,
+  Box, TextInput,
 } from '@mantine/core';
 import { MainLinks } from '../_mainLinks';
 import { Logo } from '../_logo';
 import { User } from '../_user';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Check, Files, Trash } from 'tabler-icons-react';
 import { formList, useForm } from '@mantine/form';
-// import { showNotification, updateNotification } from '@mantine/notifications';
+import { useNotifications } from '@mantine/notifications';
+
+const renameFile = (originalFile: File, newName: string) => new File(
+  [originalFile], newName, originalFile,
+);
 
 export const DeepAnalyze = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
+  const [isFileSearch, setIsFileSearch] = useState(true);
+
+  const { showNotification, updateNotification } = useNotifications();
 
   const form = useForm({
     initialValues: {
@@ -61,6 +68,12 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
         Compare
       </Button>
 
+      <Button
+        onClick={() => setIsFileSearch(!isFileSearch)}
+      >
+        {isFileSearch ? 'Search for folders' : 'Search for files'}
+      </Button>
+
       {form.values.projects.length > 0 ? (
         <Group mb='xs'>
           <Text weight={500} size='sm' sx={{ flex: 1 }}>
@@ -90,7 +103,18 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
           />
           <input
             type='file'
-            ref={(element) => refs.current[index] = element as never}
+            ref={(element) => {
+              if (element !== null) {
+                if (isFileSearch) {
+                  (element as any).removeAttribute('directory');
+                  (element as any).removeAttribute('webkitdirectory');
+                } else {
+                  (element as any).setAttribute('directory', '');
+                  (element as any).setAttribute('webkitdirectory', '');
+                }
+              }
+              return refs.current[index] = element as never;
+            }}
             style={{ display: 'none' }}
             multiple
             onChange={async ({ target: { files } }) => {
@@ -100,14 +124,26 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
               // });
               form.setValues((prevState) => {
                 if (!files || !files.length) return prevState;
-                for (let i = 0; i < files.length; i++) prevState
-                  .projects[index].files.push(files[i]);
+                for (let i = 0; i < files.length; i++) {
+                  let file = files[i];
+                  if (prevState.projects[index].files.find(
+                    ({ name }) => name === file.name,
+                  )) {
+                    let num = 1;
+                    const findMore = (num: number) => prevState.projects[index].files.find(
+                      ({ name }) => name === `${file.name} (${num})`,
+                    );
+                    while (findMore(num)) num++;
+                    file = renameFile(file, `${file.name} (${num})`);
+                  }
+                  prevState.projects[index].files.push(file);
+                }
                 return prevState;
               });
-              // updateNotification({
-              //   id: `inputFile${index}`,
+              form.clearErrors();
+              // updateNotification(`inputFile${index}`, {
               //   color: 'teal',
-              //   title: 'Loading succeed!',
+              //   message: 'Loading succeed!',
               //   icon: <Check />,
               //   autoClose: 1000,
               // });
@@ -120,7 +156,7 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
             data={form
               .getListInputProps('projects', index, 'files')
               .value.map(
-                (file: File) => ({ value: file.name, label: file.name }),
+                (file: File, i: number) => ({ value: file.name, label: file.name }),
               )
             }
             value={form
@@ -128,7 +164,7 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
               .value.map((file: File) => file.name)}
             icon={<Files />}
             onDropdownOpen={() => (refs as any).current[index].click()}
-            style={{ maxWidth: '50%', minWidth: '25%' }}
+            style={{ maxWidth: '60%', minWidth: '30%' }}
           />
           <ActionIcon
             color='red'

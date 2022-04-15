@@ -11,6 +11,7 @@ import { MantineProvider, ColorSchemeProvider, ColorScheme, Global } from '@mant
 import { APP_THEMES, DEFAULT_APP_THEME, ROUTES, SESSION_STORAGE } from '@diploma-v2/common/constants-common';
 import { getPreferredColorScheme } from '@diploma-v2/frontend/utils-frontend';
 import { DeepAnalyze } from './deepAnalyze/deepAnalyze';
+import { NotificationsProvider } from '@mantine/notifications';
 
 // const StyledApp = styled.div`
 //   // Your style here
@@ -38,24 +39,26 @@ export function App() {
   return (
     <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
       <MantineProvider theme={{ colorScheme, loader: 'bars' }}>
-        <Global
-          styles={(theme) => ({
-            body: {
+        <NotificationsProvider>
+          <Global
+            styles={(theme) => ({
+              body: {
+                height: '100%',
+                backgroundColor: theme.colorScheme === APP_THEMES.DARK ? theme.colors.dark[8] : theme.colors.gray[0],
+              },
               height: '100%',
-              backgroundColor: theme.colorScheme === APP_THEMES.DARK ? theme.colors.dark[8] : theme.colors.gray[0],
-            },
-            height: '100%',
-          })}
-        />
-        <Routes>
-          <Route path={ROUTES.ROOT} element={<Main />} />
-          <Route path={ROUTES.LOGIN} element={<Login />} />
-          <Route path={ROUTES.REGISTER} element={<Login />} />
-          <Route path={ROUTES.SETTINGS} element={<AuthSettings />} />
-          <Route path={ROUTES.SIMPLE_DIFF} element={<AuthSimpleDifference />} />
-          <Route path={ROUTES.DEEP_ANALYZE} element={<AuthDeepAnalyze />} />
-          <Route path={'*'} element={<AuthNotFound />} />
-        </Routes>
+            })}
+          />
+          <Routes>
+            <Route path={ROUTES.ROOT} element={<Main />} />
+            <Route path={ROUTES.LOGIN} element={<Login />} />
+            <Route path={ROUTES.REGISTER} element={<Login />} />
+            <Route path={ROUTES.SETTINGS} element={<AuthSettings />} />
+            <Route path={ROUTES.SIMPLE_DIFF} element={<AuthSimpleDifference />} />
+            <Route path={ROUTES.DEEP_ANALYZE} element={<AuthDeepAnalyze />} />
+            <Route path={'*'} element={<AuthNotFound />} />
+          </Routes>
+        </NotificationsProvider>
       </MantineProvider>
     </ColorSchemeProvider>
   );
