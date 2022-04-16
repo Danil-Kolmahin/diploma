@@ -1,13 +1,15 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { ComparisonService } from './comparison.service';
 import { UseGuards, BadRequestException } from '@nestjs/common';
-import { GqlAuthGuard } from '../auth/gql.auth-guard';
+import { Auth, GqlAuthGuard } from '../auth/gql.auth-guard';
 import { streamToBuffer } from '@diploma-v2/backend/utils-backend';
 import { ComparisonsEntity } from './comparison.entity';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { FilesService } from '../files/files.service';
 import { ProjectsService } from '../projects/projects.service';
 import { checkFileType } from '@diploma-v2/common/utils-common';
+import { CookieTokenDataI } from '@diploma-v2/common/constants-common';
+import { UsersService } from '../users/users.service';
 
 @Resolver('comparison')
 export class ComparisonResolver {
@@ -15,6 +17,7 @@ export class ComparisonResolver {
     private readonly comparisonService: ComparisonService,
     private readonly projectsService: ProjectsService,
     private readonly filesService: FilesService,
+    private readonly usersService: UsersService,
   ) {
   }
 
@@ -25,8 +28,10 @@ export class ComparisonResolver {
     @Args('projectNames', { type: () => [String] }) projectNames: string[],
     @Args('projectCreatorNames', { type: () => [String] }) projectCreatorNames: string[],
     @Args('fileTypes', { type: () => [String] }) fileTypes: string[],
+    @Auth() auth: CookieTokenDataI,
   ): Promise<ComparisonsEntity> {
     if (!fileTypes.length) throw new BadRequestException();
+    const user = await this.usersService.findOneById(auth.id);
     const projectsToSave = [];
     for (let i = 0; i < projects.length; i++) {
       const files = projects[i];
@@ -35,7 +40,7 @@ export class ComparisonResolver {
         if (!checkFileType(file.filename, fileTypes)) continue;
         const data = await streamToBuffer(file.createReadStream());
         const savedFile = await this.filesService.createOne({
-          ...file, data, byteLength: Buffer.byteLength(data),
+          ...file, data, byteLength: Buffer.byteLength(data), createdBy: user,
         });
         if (savedFile && savedFile.data) savedFile.data = savedFile.data.toString();
         projectFiles.push(savedFile);
@@ -45,13 +50,17 @@ export class ComparisonResolver {
         name: projectNames[i] || `Project #${i}`,
         creatorName: projectCreatorNames[i] || `unknown`,
         files: projectFiles,
+        createdBy: user,
       });
       projectsToSave.push(savedProject);
     }
     if (projectsToSave.length < 2) throw new BadRequestException();
-    return this.comparisonService.createOne({
+    const result = await this.comparisonService.createOne({
       fileTypes,
       projects: projectsToSave,
+      createdBy: user,
     });
+    console.log({result});
+    return result;
   }
 }

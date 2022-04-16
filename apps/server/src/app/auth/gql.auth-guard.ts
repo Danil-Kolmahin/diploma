@@ -14,12 +14,12 @@ export const GQLRequest = createParamDecorator(
 );
 
 export const Auth = createParamDecorator(
-  (data: unknown, context: ExecutionContext) => {
+  (data: unknown, context: ExecutionContext): CookieTokenDataI => {
     const gqlCtx = GqlExecutionContext.create(context);
     const request = gqlCtx.getContext().req;
     const cookie = request.headers.cookie;
     const token = parseCookies(cookie)[process.env.NX_AUTH_COOKIE_NAME];
-    return jwt.decode(token); // maybe service better?
+    return jwt.decode(token) as CookieTokenDataI; // maybe service better?
   },
 );
 

@@ -11,7 +11,7 @@ export class ComparisonsEntity extends CommonCreatedEntity {
   @Column({ type: 'varchar', array: true })
   fileTypes: string[];
 
-  // todo @Field()
+  @Field(() => [ProjectsEntity])
   @ManyToMany(() => ProjectsEntity)
   @JoinTable()
   projects: ProjectsEntity[];

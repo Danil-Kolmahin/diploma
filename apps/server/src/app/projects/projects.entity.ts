@@ -14,7 +14,7 @@ export class ProjectsEntity extends CommonCreatedEntity {
   @Column({ type: 'varchar' })
   creatorName: string;
 
-  // todo @Field()
+  @Field(() => [FilesEntity])
   @ManyToMany(() => FilesEntity)
   @JoinTable()
   files: FilesEntity[];

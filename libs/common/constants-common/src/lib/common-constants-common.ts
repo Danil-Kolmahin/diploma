@@ -10,8 +10,8 @@ export enum ROUTES {
   LOGIN = '/login',
   REGISTER = '/register',
   SETTINGS = '/settings',
-  SIMPLE_DIFF = '/simple-difference',
-  DEEP_ANALYZE = '/deep-analyze',
+  SIMPLE_DIFF = '/simpleDifference',
+  DEEP_ANALYZE = '/deepAnalyze',
   HISTORY = '/history',
 }
 

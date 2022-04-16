@@ -39,3 +39,5 @@ export const checkFileType = (
   );
   return checkRegEx.test(fileName);
 };
+
+export const strToBase16 = (str: string) => parseInt(str, 16).toString();

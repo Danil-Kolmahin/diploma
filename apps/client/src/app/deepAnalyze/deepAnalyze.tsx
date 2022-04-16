@@ -29,10 +29,21 @@ const MAKE_COMPARISON = gql`
       projects: $projects
     ) {
       createdAt
+      createdBy {
+        email
+      }
       doneAt
       doneOn
       fileTypes
       id
+      projects {
+        name
+        creatorName
+        files {
+          filename
+          byteLength
+        }
+      }
       updatedAt
     }
   }

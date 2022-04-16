@@ -1,6 +1,6 @@
 import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-// import { UsersEntity } from '../users/users.entity';
+import { UsersEntity } from '../users/users.entity';
 
 @ObjectType()
 @Entity()
@@ -21,7 +21,7 @@ export class CommonEntity {
 @ObjectType()
 @Entity()
 export class CommonCreatedEntity extends CommonEntity {
-  // todo @Field()
-  // @ManyToOne(() => UsersEntity)
-  // createdBy: UsersEntity;
+  @Field(() => UsersEntity)
+  @ManyToOne(() => UsersEntity)
+  createdBy: UsersEntity;
 }
