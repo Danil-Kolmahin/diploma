@@ -3,6 +3,7 @@
 # custom
 .env
 schema.gql
+package-lock.json
 
 # compiled output
 /dist
