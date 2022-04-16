@@ -15,6 +15,9 @@
 		"skipDefaultLibCheck": true,
 		"baseUrl": ".",
 		"paths": {
+			"@diploma-v2/backend/constants-common": [
+				"libs/backend/constants-common/src/index.ts"
+			],
 			"@diploma-v2/backend/utils-backend": [
 				"libs/backend/utils-backend/src/index.ts"
 			],
@@ -26,6 +29,9 @@
 			],
 			"@diploma-v2/common/utils-common": [
 				"libs/common/utils-common/src/index.ts"
+			],
+			"@diploma-v2/frontend/constants-common": [
+				"libs/frontend/constants-common/src/index.ts"
 			],
 			"@diploma-v2/frontend/utils-frontend": [
 				"libs/frontend/utils-frontend/src/index.ts"

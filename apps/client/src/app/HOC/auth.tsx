@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Buffer } from 'buffer';
 import { Navigate } from 'react-router-dom';
 import { isObject, parseCookies } from '@diploma-v2/common/utils-common';
-import { CookieTokenDataI } from '@diploma-v2/common/types-common';
-import { ROUTES } from '@diploma-v2/common/constants-common';
+import { CookieTokenDataI, ROUTES } from '@diploma-v2/common/constants-common';
 
 const parseJwt = (token: string) => {
   const [, base64Payload] = token.split('.');

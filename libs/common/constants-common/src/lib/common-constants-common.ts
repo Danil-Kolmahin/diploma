@@ -31,3 +31,10 @@ export const POSSIBLE_FILE_TYPES: { [key: string]: string[] } = {
 export interface ComparisonResult {
   compatibility: number;
 }
+
+export interface CookieTokenDataI {
+	email: string;
+	id: string;
+	iat: number;
+	exp: number;
+}

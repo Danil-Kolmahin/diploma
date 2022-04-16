@@ -1,0 +1,23 @@
+{
+	"root": "libs/backend/constants-common",
+	"sourceRoot": "libs/backend/constants-common/src",
+	"projectType": "library",
+	"targets": {
+		"lint": {
+			"executor": "@nrwl/linter:eslint",
+			"outputs": ["{options.outputFile}"],
+			"options": {
+				"lintFilePatterns": ["libs/backend/constants-common/**/*.ts"]
+			}
+		},
+		"test": {
+			"executor": "@nrwl/jest:jest",
+			"outputs": ["coverage/libs/backend/constants-common"],
+			"options": {
+				"jestConfig": "libs/backend/constants-common/jest.config.js",
+				"passWithNoTests": true
+			}
+		}
+	},
+	"tags": []
+}
