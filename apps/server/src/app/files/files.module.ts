@@ -8,6 +8,7 @@ import { FilesResolver } from './files.resolver';
 @Module({
   imports: [TypeOrmModule.forFeature([FilesEntity]), AuthModule],
   providers: [FilesService, FilesResolver],
+  exports: [FilesService],
 })
 export class FilesModule {
 }

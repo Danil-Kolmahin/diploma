@@ -12,11 +12,31 @@ import React, { useRef, useState } from 'react';
 import { Files, File, Folder, NewSection, Trash } from 'tabler-icons-react';
 import { formList, useForm } from '@mantine/form';
 import { renameFile } from '@diploma-v2/frontend/utils-frontend';
+import { POSSIBLE_FILE_TYPES } from '@diploma-v2/common/constants-common';
+import { gql, useMutation } from '@apollo/client';
 
-const POSSIBLE_FILE_TYPES: { [key: string]: string[] } = {
-  'JavaScript': ['.js', '.jsx'],
-  'TypeScript': ['.ts', '.tsx'],
-};
+const MAKE_COMPARISON = gql`
+  mutation(
+    $fileTypes: [String!]!
+    $projectCreatorNames: [String!]!
+    $projectNames: [String!]!
+    $projects: [[Upload!]!]!
+  ) {
+    makeComparison(
+      fileTypes: $fileTypes
+      projectCreatorNames: $projectCreatorNames
+      projectNames: $projectNames
+      projects: $projects
+    ) {
+      createdAt
+      doneAt
+      doneOn
+      fileTypes
+      id
+      updatedAt
+    }
+  }
+`;
 
 export const DeepAnalyze = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
@@ -31,6 +51,7 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
       fileTypes: Object.keys(POSSIBLE_FILE_TYPES),
     },
   });
+  const [makeComparison] = useMutation(MAKE_COMPARISON);
 
   return <AppShell
     fixed
@@ -51,7 +72,24 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
     <Grid justify='space-around'>
       <Grid.Col span={3}><Center><Button
         color={'green'}
-        onClick={() => console.log(form.values.projects)}
+        onClick={async () => {
+          const variables = {
+            fileTypes: [] as string[],
+            projectCreatorNames: [] as string[],
+            projectNames: [] as string[],
+            projects: [] as File[][],
+          };
+          for (const fileType of form.values.fileTypes) {
+            variables.fileTypes = variables.fileTypes.concat(POSSIBLE_FILE_TYPES[fileType]);
+          }
+          form.values.projects.forEach(project => {
+            variables.projectCreatorNames.push(project.creatorName);
+            variables.projectNames.push(project.name);
+            variables.projects.push(project.files);
+          });
+          const result = await makeComparison({ variables });
+          console.log(result);
+        }}
       >
         Compare
       </Button></Center></Grid.Col>
@@ -74,7 +112,7 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
       <Grid.Col span={12}>{form.values.projects.map((_, index) => (
         <Group key={index} mt='xs'>
           <TextInput
-            placeholder='Project name'
+            placeholder='Project name' // todo `Project #${form.values.projects.length + 1}`
             sx={{ flex: 1 }}
             {...form.getListInputProps('projects', index, 'name')}
           />

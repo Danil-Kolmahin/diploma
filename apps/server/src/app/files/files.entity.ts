@@ -1,10 +1,10 @@
 import { Column, Entity } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { CommonEntity } from '../common/common.entity';
+import { CommonCreatedEntity } from '../common/common.entity';
 
 @ObjectType()
 @Entity('files')
-export class FilesEntity extends CommonEntity {
+export class FilesEntity extends CommonCreatedEntity {
   @Field()
   @Column({ type: 'varchar' })
   filename: string;

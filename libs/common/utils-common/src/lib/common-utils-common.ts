@@ -25,3 +25,17 @@ export const parseCookies = (cookies: string): { [key: string]: string } => {
   }
   return result;
 };
+
+// todo refactor
+export const checkFileType = (
+  fileName: string, possibleFileTypes: string[], // .js .tsx
+) => {
+  const checkRegEx = new RegExp(
+    `([.](${
+      possibleFileTypes.map(
+        (t: string) => t.slice(1),
+      ).join('|')
+    }))$`,
+  );
+  return checkRegEx.test(fileName);
+};

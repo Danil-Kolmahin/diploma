@@ -22,3 +22,12 @@ export enum SESSION_STORAGE {
   APP_SIMPLE_DIFF_TEXT1 = 'DIPLOMA_V2_APP_SIMPLE_DIFF_TEXT1',
   APP_SIMPLE_DIFF_TEXT2 = 'DIPLOMA_V2_APP_SIMPLE_DIFF_TEXT2',
 }
+
+export const POSSIBLE_FILE_TYPES: { [key: string]: string[] } = {
+  'JavaScript': ['.js', '.jsx'],
+  'TypeScript': ['.ts', '.tsx'],
+};
+
+export interface ComparisonResult {
+  compatibility: number;
+}
