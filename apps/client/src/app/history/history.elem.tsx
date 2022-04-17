@@ -1,11 +1,12 @@
 import {
   AppShell,
-  Code,
+  Center,
   Group,
   Header,
   Loader,
   Navbar,
   Paper,
+  Title,
   useMantineTheme,
 } from '@mantine/core';
 import { MainLinks } from '../_mainLinks';
@@ -15,6 +16,7 @@ import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { OopsPage } from '../common/OopsPage';
 import { useParams } from 'react-router-dom';
+import { Prism } from '@mantine/prism';
 
 const FIND_COMPARISON_BY_ID = gql`
   query (
@@ -24,9 +26,6 @@ const FIND_COMPARISON_BY_ID = gql`
       id: $id
     ) {
       createdAt
-      createdBy {
-        email
-      }
       doneAt
       doneOn
       fileTypes
@@ -39,7 +38,6 @@ const FIND_COMPARISON_BY_ID = gql`
           byteLength
         }
       }
-      updatedAt
     }
   }
 `;
@@ -68,14 +66,23 @@ export const HistoryElem = ({ parsedCookie }: any) => {
     }
   >
 
-    {loading ? <Loader /> : error ? <OopsPage /> : <>
-      <Paper
-        shadow='xs'
-        p='md'
+    {loading ? <Loader /> : error ? <OopsPage /> : <Paper
+      shadow='xs'
+      p='md'
+    >
+      <Center><Title order={3}>{data.findComparisonById.id}</Title></Center>
+      <Prism
+        language='json'
+        withLineNumbers
+        noCopy
       >
-        <Code>{JSON.stringify(data, null, 2)}</Code>
-      </Paper>
-    </>
+        {JSON.stringify(
+          data.findComparisonById,
+          (k, v) => k === '__typename' || k === 'id' ? undefined : v,
+          2,
+        )}
+      </Prism>
+    </Paper>
     }
 
   </AppShell>;

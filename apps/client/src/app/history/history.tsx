@@ -9,7 +9,6 @@ import {
   Pagination,
   Paper, Progress,
   Table,
-  Title,
   Text,
   useMantineTheme,
 } from '@mantine/core';
