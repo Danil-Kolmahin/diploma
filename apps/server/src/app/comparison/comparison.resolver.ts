@@ -79,4 +79,11 @@ export class ComparisonResolver {
     const user = await this.usersService.findOneById(auth.id);
     return this.comparisonService.getCountByUser(user);
   }
+
+  @Query(() => ComparisonsEntity, { nullable: true })
+  async findComparisonById(
+    @Args('id') id: string,
+  ): Promise<ComparisonsEntity | null> {
+    return this.comparisonService.findOneById(id);
+  }
 }

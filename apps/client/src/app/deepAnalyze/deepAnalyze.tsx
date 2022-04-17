@@ -12,8 +12,9 @@ import React, { useRef, useState } from 'react';
 import { Files, File, Folder, NewSection, Trash } from 'tabler-icons-react';
 import { formList, useForm } from '@mantine/form';
 import { renameFile } from '@diploma-v2/frontend/utils-frontend';
-import { POSSIBLE_FILE_TYPES } from '@diploma-v2/common/constants-common';
+import { POSSIBLE_FILE_TYPES, ROUTES } from '@diploma-v2/common/constants-common';
 import { gql, useMutation } from '@apollo/client';
+import { useNavigate } from 'react-router-dom';
 
 const MAKE_COMPARISON = gql`
   mutation(
@@ -28,23 +29,7 @@ const MAKE_COMPARISON = gql`
       projectNames: $projectNames
       projects: $projects
     ) {
-      createdAt
-      createdBy {
-        email
-      }
-      doneAt
-      doneOn
-      fileTypes
       id
-      projects {
-        name
-        creatorName
-        files {
-          filename
-          byteLength
-        }
-      }
-      updatedAt
     }
   }
 `;
@@ -53,6 +38,7 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
   const refs = useRef([]);
   const [isFileSearch, setIsFileSearch] = useState(true);
+  const navigate = useNavigate();
   const form = useForm({
     initialValues: {
       projects: formList<{ name: string, creatorName: string, files: File[] }>([
@@ -98,8 +84,8 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
             variables.projectNames.push(project.name);
             variables.projects.push(project.files);
           });
-          const result = await makeComparison({ variables });
-          console.log(result);
+          const { data, errors } = await makeComparison({ variables });
+          !errors && navigate(`${ROUTES.HISTORY}/${data?.makeComparison?.id?.toString()}`);
         }}
       >
         Compare

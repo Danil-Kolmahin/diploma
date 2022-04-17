@@ -13,7 +13,7 @@ import { MainLinks } from '../_mainLinks';
 import { Logo } from '../_logo';
 import { User } from '../_user';
 import React from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
 import { OopsPage } from '../common/OopsPage';
 
@@ -53,6 +53,7 @@ const ITEMS_ON_PAGE = 5;
 export const History = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { loading, error, data } = useQuery(FIND_ALL_COMPARISON, {
     variables: {
       skip: (parseInt(searchParams.get('page') || '1', 10) - 1) * parseInt(
@@ -100,6 +101,7 @@ export const History = ({ parsedCookie }: any) => {
         shadow='xs'
         p='md'
         key={index}
+        onClick={() => navigate(data.id.toString())}
       >
         <Code>{JSON.stringify(data, null, 2)}</Code>
       </Paper>)}

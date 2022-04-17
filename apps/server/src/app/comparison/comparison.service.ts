@@ -30,4 +30,10 @@ export class ComparisonService {
   async getCountByUser(user: UsersEntity): Promise<number> {
     return this.comparisonsEntity.count({ createdBy: user });
   }
+
+  async findOneById(id: string): Promise<ComparisonsEntity | null> {
+    return this.comparisonsEntity.findOne({
+      where: { id }, relations: ['projects', 'createdBy', 'projects.files'],
+    });
+  }
 }
