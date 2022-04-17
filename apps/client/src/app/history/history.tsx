@@ -1,12 +1,16 @@
 import {
   AppShell,
-  Code,
+  Center,
+  Code, Grid,
   Group,
   Header,
   Loader,
   Navbar,
   Pagination,
-  Paper,
+  Paper, Progress,
+  Table,
+  Title,
+  Text,
   useMantineTheme,
 } from '@mantine/core';
 import { MainLinks } from '../_mainLinks';
@@ -27,22 +31,16 @@ const FIND_ALL_COMPARISON = gql`
       skip: $skip
     ) {
       createdAt
-      createdBy {
-        email
-      }
       doneAt
       doneOn
-      fileTypes
       id
       projects {
         name
         creatorName
         files {
-          filename
-          byteLength
+          id
         }
       }
-      updatedAt
     }
     getComparisonsCount
   }
@@ -94,17 +92,52 @@ export const History = ({ parsedCookie }: any) => {
           setSearchParams({ ...params, page: page.toString() });
         }}
         withControls={false}
+        mb={'xs'}
       />
 
-      {(data
-        .findAllComparisons as any[]).map((data, index) => <Paper
-        shadow='xs'
-        p='md'
-        key={index}
-        onClick={() => navigate(data.id.toString())}
-      >
-        <Code>{JSON.stringify(data, null, 2)}</Code>
-      </Paper>)}
+      {(data.findAllComparisons as any[])
+        .map((data, index) => <Paper
+          shadow='xs'
+          p='md'
+          key={index}
+          onClick={() => navigate(data.id)}
+          mb={'xs'}
+        >
+          <Grid grow>
+            <Grid.Col span={8}>
+              <Text size={'lg'} weight={500}>{`Comparison # ${data.id.slice(0, 8)}...`}</Text>
+              <Progress value={data.doneOn * 100} />
+              {data.doneOn === 1 ?
+                <Code>{data.results}</Code> :
+                <Text align={'center'} size={'lg'}>{'Processing...'}</Text>
+              }
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <Center>
+                <Text size={'sm'}>{data.createdAt}</Text> {/* todo .toISOString() SHOULD be Date */}
+              </Center>
+              {data.doneOn === 1 && <Center>
+                <Text size={'sm'}>{data.doneAt}</Text>
+              </Center>}
+              <Table>
+                <tbody>
+                {data.projects.slice(0, 3).map((project: any) => (
+                  <tr key={project.name}>
+                    <td>{project.name}</td>
+                    <td>{project.creatorName}</td>
+                    <td style={{
+                      textDecoration: 'underline',
+                      color: theme.colors.blue[9]
+                    }}
+                    >{`${project.files.length} files`}</td>
+                  </tr>
+                ))}
+                </tbody>
+              </Table>
+              <Center>{data.projects.length > 3 && '...'}</Center>
+            </Grid.Col>
+          </Grid>
+        </Paper>)}
 
       <Pagination
         page={parseInt(searchParams.get('page') || '1', 10)}
