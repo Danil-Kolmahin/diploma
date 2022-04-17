@@ -12,6 +12,7 @@ import { APP_THEMES, DEFAULT_APP_THEME, ROUTES, SESSION_STORAGE } from '@diploma
 import { getPreferredColorScheme } from '@diploma-v2/frontend/utils-frontend';
 import { DeepAnalyze } from './deepAnalyze/deepAnalyze';
 import { NotificationsProvider } from '@mantine/notifications';
+import { History } from './history/history';
 
 // const StyledApp = styled.div`
 //   // Your style here
@@ -20,6 +21,7 @@ import { NotificationsProvider } from '@mantine/notifications';
 const AuthSettings = withAuth(Settings);
 const AuthSimpleDifference = withAuth(SimpleDifference);
 const AuthDeepAnalyze = withAuth(DeepAnalyze);
+const AuthHistory = withAuth(History);
 const AuthNotFound = withAuth(NotFound);
 
 export function App() {
@@ -56,6 +58,7 @@ export function App() {
             <Route path={ROUTES.SETTINGS} element={<AuthSettings />} />
             <Route path={ROUTES.SIMPLE_DIFF} element={<AuthSimpleDifference />} />
             <Route path={ROUTES.DEEP_ANALYZE} element={<AuthDeepAnalyze />} />
+            <Route path={ROUTES.HISTORY} element={<AuthHistory />} />
             <Route path={'*'} element={<AuthNotFound />} />
           </Routes>
         </NotificationsProvider>

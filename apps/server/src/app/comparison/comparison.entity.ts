@@ -1,5 +1,5 @@
 import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Float, ObjectType } from '@nestjs/graphql';
 import { CommonCreatedEntity } from '../common/common.entity';
 import { ComparisonResult } from '@diploma-v2/common/constants-common';
 import { ProjectsEntity } from '../projects/projects.entity';
@@ -16,7 +16,7 @@ export class ComparisonsEntity extends CommonCreatedEntity {
   @JoinTable()
   projects: ProjectsEntity[];
 
-  @Field()
+  @Field(() => Float)
   @Column({ type: 'smallint', default: 0 })
   doneOn?: number;
 

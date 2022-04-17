@@ -1,6 +1,6 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ComparisonService } from './comparison.service';
-import { UseGuards, BadRequestException } from '@nestjs/common';
+import { UseGuards, BadRequestException, ValidationPipe } from '@nestjs/common';
 import { Auth, GqlAuthGuard } from '../auth/gql.auth-guard';
 import { streamToBuffer } from '@diploma-v2/backend/utils-backend';
 import { ComparisonsEntity } from './comparison.entity';
@@ -10,6 +10,7 @@ import { ProjectsService } from '../projects/projects.service';
 import { checkFileType } from '@diploma-v2/common/utils-common';
 import { CookieTokenDataI } from '@diploma-v2/common/constants-common';
 import { UsersService } from '../users/users.service';
+import { BasePaginationArgs } from '../common/common.resolver';
 
 @Resolver('comparison')
 export class ComparisonResolver {
@@ -55,12 +56,27 @@ export class ComparisonResolver {
       projectsToSave.push(savedProject);
     }
     if (projectsToSave.length < 2) throw new BadRequestException();
-    const result = await this.comparisonService.createOne({
+    return this.comparisonService.createOne({
       fileTypes,
       projects: projectsToSave,
       createdBy: user,
     });
-    console.log({result});
-    return result;
+  }
+
+  @Query(() => [ComparisonsEntity])
+  async findAllComparisons(
+    @Args('', new ValidationPipe()) basePG: BasePaginationArgs,
+    @Auth() auth: CookieTokenDataI,
+  ): Promise<ComparisonsEntity[]> {
+    const user = await this.usersService.findOneById(auth.id);
+    return this.comparisonService.findAllByUserPG(user, basePG);
+  }
+
+  @Query(() => Int)
+  async getComparisonsCount(
+    @Auth() auth: CookieTokenDataI,
+  ): Promise<number> {
+    const user = await this.usersService.findOneById(auth.id);
+    return this.comparisonService.getCountByUser(user);
   }
 }

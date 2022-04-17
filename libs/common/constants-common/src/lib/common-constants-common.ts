@@ -38,3 +38,5 @@ export interface CookieTokenDataI {
 	iat: number;
 	exp: number;
 }
+
+export const MAX_32BIT_INT = 2 ** 31 - 1;
