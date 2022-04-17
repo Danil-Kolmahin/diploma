@@ -26,7 +26,10 @@ export class ComparisonService {
     limit = MAX_32BIT_INT,
   } = {}): Promise<ComparisonsEntity[]> {
     return this.comparisonsEntity.find({
-      where: { createdBy: user }, skip, take: limit, relations: ['projects', 'createdBy', 'projects.files'],
+      where: { createdBy: user },
+      skip, take: limit,
+      relations: ['projects', 'createdBy', 'projects.files'],
+      order: { createdAt: 'DESC' }
     });
   }
 

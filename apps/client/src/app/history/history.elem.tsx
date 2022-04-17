@@ -25,6 +25,7 @@ const FIND_COMPARISON_BY_ID = gql`
     findComparisonById (
       id: $id
     ) {
+      results
       createdAt
       doneAt
       doneOn

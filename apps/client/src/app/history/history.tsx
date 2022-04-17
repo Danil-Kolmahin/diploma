@@ -1,7 +1,7 @@
 import {
   AppShell,
   Center,
-  Code, Grid,
+  Grid,
   Group,
   Header,
   Loader,
@@ -19,6 +19,7 @@ import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
 import { OopsPage } from '../common/OopsPage';
+import { Prism } from '@mantine/prism';
 
 const FIND_ALL_COMPARISON = gql`
   query (
@@ -40,12 +41,14 @@ const FIND_ALL_COMPARISON = gql`
           id
         }
       }
+      results
     }
     getComparisonsCount
   }
 `;
 
 const ITEMS_ON_PAGE = 5;
+const MAX_PRESENTATION_CODE_LEN = 70;
 
 export const History = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
@@ -100,15 +103,34 @@ export const History = ({ parsedCookie }: any) => {
           shadow='xs'
           p='md'
           key={index}
-          onClick={() => navigate(data.id)}
           mb={'xs'}
         >
           <Grid grow>
             <Grid.Col span={8}>
-              <Text size={'lg'} weight={500}>{`Comparison # ${data.id.slice(0, 8)}...`}</Text>
+              <Text size={'lg'} weight={500} onClick={() => navigate(data.id)}>
+                {`Comparison # ${data.id.slice(0, 8)}...`}
+              </Text>
               <Progress value={data.doneOn * 100} />
               {data.doneOn === 1 ?
-                <Code>{data.results}</Code> :
+                <Prism
+                  language='json'
+                  withLineNumbers
+                  noCopy
+                >
+                  {(() => {
+                    const code = JSON.stringify(
+                      data.results,
+                      (k, v) => {
+                        const sumLen = k.toString().length + v.toString().length;
+                        if (sumLen < MAX_PRESENTATION_CODE_LEN) return v;
+                        if (k.toString().length > MAX_PRESENTATION_CODE_LEN - '...'.length) return '...';
+                        return v.toString().slice(0, MAX_PRESENTATION_CODE_LEN - k.toString().length - '...'.length) + '...';
+                      },
+                      2,
+                    );
+                    return code.split('\n').slice(0, 4).join('\n') + ((code.split('\n').length > 4) ? '\n...' : '');
+                  })()}
+                </Prism> :
                 <Text align={'center'} size={'lg'}>{'Processing...'}</Text>
               }
             </Grid.Col>
@@ -127,7 +149,7 @@ export const History = ({ parsedCookie }: any) => {
                     <td>{project.creatorName}</td>
                     <td style={{
                       textDecoration: 'underline',
-                      color: theme.colors.blue[9]
+                      color: theme.colors.blue[9],
                     }}
                     >{`${project.files.length} files`}</td>
                   </tr>

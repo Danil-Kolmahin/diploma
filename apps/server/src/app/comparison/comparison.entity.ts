@@ -3,6 +3,7 @@ import { Field, Float, ObjectType } from '@nestjs/graphql';
 import { CommonCreatedEntity } from '../common/common.entity';
 import { ComparisonResult } from '@diploma-v2/common/constants-common';
 import { ProjectsEntity } from '../projects/projects.entity';
+import { GraphQLJSON } from 'graphql-type-json';
 
 @ObjectType()
 @Entity('comparisons')
@@ -24,7 +25,7 @@ export class ComparisonsEntity extends CommonCreatedEntity {
   @Column({ type: 'timestamp', nullable: true })
   doneAt?: Date;
 
-  // @Field()
+  @Field(() => GraphQLJSON, { nullable: true })
   @Column({ type: 'json', nullable: true })
   results?: ComparisonResult;
 }
