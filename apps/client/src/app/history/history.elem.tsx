@@ -47,6 +47,7 @@ export const HistoryElem = ({ parsedCookie }: any) => {
   const { id } = useParams();
   const { loading, error, data } = useQuery(FIND_COMPARISON_BY_ID, {
     variables: { id },
+    pollInterval: 250,
   });
 
   return <AppShell

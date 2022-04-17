@@ -17,7 +17,7 @@ export class ComparisonsEntity extends CommonCreatedEntity {
   projects: ProjectsEntity[];
 
   @Field(() => Float)
-  @Column({ type: 'smallint', default: 0 })
+  @Column({ type: 'float', default: 0 })
   doneOn?: number;
 
   @Field({ nullable: true })

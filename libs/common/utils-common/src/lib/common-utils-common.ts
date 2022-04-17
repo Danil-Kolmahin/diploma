@@ -41,3 +41,5 @@ export const checkFileType = (
 };
 
 export const strToBase16 = (str: string) => parseInt(str, 16).toString();
+
+export const factorial = (n: number): number => n ?  (n * factorial(n-1)) : 1;

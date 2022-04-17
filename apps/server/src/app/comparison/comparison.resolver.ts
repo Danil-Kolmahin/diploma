@@ -56,11 +56,13 @@ export class ComparisonResolver {
       projectsToSave.push(savedProject);
     }
     if (projectsToSave.length < 2) throw new BadRequestException();
-    return this.comparisonService.createOne({
+    const createdComparison = await this.comparisonService.createOne({
       fileTypes,
       projects: projectsToSave,
       createdBy: user,
     });
+    this.comparisonService.makeComparison(createdComparison).then();
+    return createdComparison;
   }
 
   @Query(() => [ComparisonsEntity])

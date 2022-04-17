@@ -60,6 +60,7 @@ export const History = ({ parsedCookie }: any) => {
         searchParams.get('limit') || ITEMS_ON_PAGE.toString(), 10,
       ),
     },
+    pollInterval: 500,
   });
 
   return <AppShell

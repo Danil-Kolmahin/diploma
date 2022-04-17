@@ -29,7 +29,8 @@ export const POSSIBLE_FILE_TYPES: { [key: string]: string[] } = {
 };
 
 export interface ComparisonResult {
-  compatibility: number;
+  // compatibility: number; todo !!!
+  [key: string]: unknown
 }
 
 export interface CookieTokenDataI {
