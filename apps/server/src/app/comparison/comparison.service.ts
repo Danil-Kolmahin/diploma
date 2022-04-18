@@ -68,7 +68,7 @@ export class ComparisonService {
           (acc, file) => acc + file.byteLength, 0,
         );
         results[`projectsFullTextComparison:${curProject.name}-${projectToCompare.name}`] =
-          projectsFullTextComparison / (curProjectFilesLength + projectToCompareFilesLength) / 2;
+          projectsFullTextComparison / (curProjectFilesLength + projectToCompareFilesLength + 1) / 2;
         results[`projectsFullTextComparisonSimplePieces:${curProject.name}-${projectToCompare.name}`] =
           simplePieces;
 
