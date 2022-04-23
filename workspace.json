@@ -5,6 +5,7 @@
 		"backend-utils-backend": "libs/backend/utils-backend",
 		"client": "apps/client",
 		"common-constants-common": "libs/common/constants-common",
+		"common-source-codes-comparing-methods": "libs/common/source-codes-comparing-methods",
 		"common-utils-common": "libs/common/utils-common",
 		"frontend-constants-common": "libs/frontend/constants-common",
 		"frontend-utils-frontend": "libs/frontend/utils-frontend",

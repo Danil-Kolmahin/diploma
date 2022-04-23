@@ -1,0 +1,25 @@
+{
+	"root": "libs/common/source-codes-comparing-methods",
+	"sourceRoot": "libs/common/source-codes-comparing-methods/src",
+	"projectType": "library",
+	"targets": {
+		"lint": {
+			"executor": "@nrwl/linter:eslint",
+			"outputs": ["{options.outputFile}"],
+			"options": {
+				"lintFilePatterns": [
+					"libs/common/source-codes-comparing-methods/**/*.ts"
+				]
+			}
+		},
+		"test": {
+			"executor": "@nrwl/jest:jest",
+			"outputs": ["coverage/libs/common/source-codes-comparing-methods"],
+			"options": {
+				"jestConfig": "libs/common/source-codes-comparing-methods/jest.config.js",
+				"passWithNoTests": true
+			}
+		}
+	},
+	"tags": []
+}

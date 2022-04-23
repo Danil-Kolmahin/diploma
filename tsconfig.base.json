@@ -24,6 +24,9 @@
 			"@diploma-v2/common/constants-common": [
 				"libs/common/constants-common/src/index.ts"
 			],
+			"@diploma-v2/common/source-codes-comparing-methods": [
+				"libs/common/source-codes-comparing-methods/src/index.ts"
+			],
 			"@diploma-v2/common/types-common": [
 				"libs/common/types-common/src/index.ts"
 			],
