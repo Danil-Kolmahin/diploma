@@ -8,6 +8,7 @@ import { MAX_32BIT_INT } from '@diploma-v2/common/constants-common';
 import { Greedy } from 'string-mismatch';
 import { FilesEntity } from '../files/files.entity';
 import { factorial } from '@diploma-v2/common/utils-common';
+import { damerauLevenshtein } from '@diploma-v2/common/source-codes-comparing-methods';
 
 @Injectable()
 export class ComparisonService {
@@ -52,6 +53,7 @@ export class ComparisonService {
 
         let projectsFullTextComparison = 0;
         let simplePieces = [];
+        const distances = {};
         for (let ci = 0; ci < curProject.files.length; ci++) {
           for (let cj = 0; cj < projectToCompare.files.length; cj++) {
             const [simpleStringsLength, newSimplePieces] = await this.fullTextComparison(
@@ -59,6 +61,9 @@ export class ComparisonService {
             );
             projectsFullTextComparison += simpleStringsLength;
             simplePieces = simplePieces.concat(newSimplePieces);
+            distances[`${ci}|${cj}`] = damerauLevenshtein(
+              curProject.files[ci].data.toString(), projectToCompare.files[cj].data.toString()
+            );
           }
         }
         const curProjectFilesLength = curProject.files.reduce(
@@ -71,6 +76,9 @@ export class ComparisonService {
           projectsFullTextComparison / (curProjectFilesLength + projectToCompareFilesLength + 1) / 2;
         results[`projectsFullTextComparisonSimplePieces:${curProject.name}-${projectToCompare.name}`] =
           simplePieces;
+
+        results[`projectsDamerauLevenshteinDistance:${curProject.name}-${projectToCompare.name}`] =
+          distances;
 
         cmp.doneOn = 1 / factorial(cmp.projects.length - 1);
         await this.comparisonsEntity.save(cmp);
