@@ -4,6 +4,7 @@
 		"backend-constants-common": "libs/backend/constants-common",
 		"backend-utils-backend": "libs/backend/utils-backend",
 		"client": "apps/client",
+		"common-artificial-intelligence": "libs/common/artificial-intelligence",
 		"common-constants-common": "libs/common/constants-common",
 		"common-source-codes-comparing-methods": "libs/common/source-codes-comparing-methods",
 		"common-utils-common": "libs/common/utils-common",

@@ -1,0 +1,23 @@
+{
+	"root": "libs/common/artificial-intelligence",
+	"sourceRoot": "libs/common/artificial-intelligence/src",
+	"projectType": "library",
+	"targets": {
+		"lint": {
+			"executor": "@nrwl/linter:eslint",
+			"outputs": ["{options.outputFile}"],
+			"options": {
+				"lintFilePatterns": ["libs/common/artificial-intelligence/**/*.ts"]
+			}
+		},
+		"test": {
+			"executor": "@nrwl/jest:jest",
+			"outputs": ["coverage/libs/common/artificial-intelligence"],
+			"options": {
+				"jestConfig": "libs/common/artificial-intelligence/jest.config.js",
+				"passWithNoTests": true
+			}
+		}
+	},
+	"tags": []
+}

@@ -21,6 +21,9 @@
 			"@diploma-v2/backend/utils-backend": [
 				"libs/backend/utils-backend/src/index.ts"
 			],
+			"@diploma-v2/common/artificial-intelligence": [
+				"libs/common/artificial-intelligence/src/index.ts"
+			],
 			"@diploma-v2/common/constants-common": [
 				"libs/common/constants-common/src/index.ts"
 			],
