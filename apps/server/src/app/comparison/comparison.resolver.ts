@@ -12,6 +12,7 @@ import { CookieTokenDataI } from '@diploma-v2/common/constants-common';
 import { UsersService } from '../users/users.service';
 import { BasePaginationArgs } from '../common/common.resolver';
 import * as prettier from 'prettier';
+import * as strip from 'strip-comments';
 
 @Resolver('comparison')
 export class ComparisonResolver {
@@ -43,6 +44,7 @@ export class ComparisonResolver {
         let data = (await streamToBuffer(file.createReadStream())).toString();
         try {
           data = prettier.format(data, { parser: 'babel-ts' });
+          data = strip(data);
         } catch (error) {
           console.log({ error, date: new Date() });
         }
