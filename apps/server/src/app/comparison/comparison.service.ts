@@ -9,6 +9,7 @@ import { Greedy } from 'string-mismatch';
 import { FilesEntity } from '../files/files.entity';
 import { factorial } from '@diploma-v2/common/utils-common';
 import { damerauLevenshtein } from '@diploma-v2/common/source-codes-comparing-methods';
+import { ProjectsEntity } from '../projects/projects.entity';
 
 @Injectable()
 export class ComparisonService {
@@ -46,39 +47,33 @@ export class ComparisonService {
 
   async makeComparison(cmp: ComparisonsEntity): Promise<ComparisonsEntity> {
     const results = {};
+
     for (let i = 0; i < cmp.projects.length - 1; i++) {
       const curProject = cmp.projects[i];
       for (let j = i + 1; j < cmp.projects.length; j++) {
         const projectToCompare = cmp.projects[j];
+        const curProjectPath = `${curProject.id}|${projectToCompare.id}`;
+        results[curProjectPath] = {};
 
-        let projectsFullTextComparison = 0;
-        let simplePieces = [];
-        const distances = {};
         for (let ci = 0; ci < curProject.files.length; ci++) {
           for (let cj = 0; cj < projectToCompare.files.length; cj++) {
+            const curFilePath = `${ curProject.files[ci].id}|${projectToCompare.files[cj].id}`;
+            results[curProjectPath][curFilePath] = {};
+
             const [simpleStringsLength, newSimplePieces] = await this.fullTextComparison(
               curProject.files[ci], projectToCompare.files[cj],
             );
-            projectsFullTextComparison += simpleStringsLength;
-            simplePieces = simplePieces.concat(newSimplePieces);
-            distances[`${ci}|${cj}`] = damerauLevenshtein(
+            results[curProjectPath][curFilePath]['FTC'] = simpleStringsLength; // Full Text Comparison
+            results[curProjectPath][curFilePath]['simplePieces'] = newSimplePieces;
+
+            results[curProjectPath][curFilePath]['DLD'] = damerauLevenshtein( // Damerau Levenshtein Distance
               curProject.files[ci].data.toString(), projectToCompare.files[cj].data.toString()
             );
+
+            results[curProjectPath][curFilePath]['fileLengths'] =
+              [curProject.files[ci].byteLength, projectToCompare.files[cj].byteLength];
           }
         }
-        const curProjectFilesLength = curProject.files.reduce(
-          (acc, file) => acc + file.byteLength, 0,
-        );
-        const projectToCompareFilesLength = projectToCompare.files.reduce(
-          (acc, file) => acc + file.byteLength, 0,
-        );
-        results[`projectsFullTextComparison:${curProject.name}-${projectToCompare.name}`] =
-          projectsFullTextComparison / (curProjectFilesLength + projectToCompareFilesLength + 1) / 2;
-        results[`projectsFullTextComparisonSimplePieces:${curProject.name}-${projectToCompare.name}`] =
-          simplePieces;
-
-        results[`projectsDamerauLevenshteinDistance:${curProject.name}-${projectToCompare.name}`] =
-          distances;
 
         cmp.doneOn = 1 / factorial(cmp.projects.length - 1);
         await this.comparisonsEntity.save(cmp);
