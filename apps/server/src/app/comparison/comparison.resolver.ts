@@ -11,6 +11,7 @@ import { checkFileType } from '@diploma-v2/common/utils-common';
 import { CookieTokenDataI } from '@diploma-v2/common/constants-common';
 import { UsersService } from '../users/users.service';
 import { BasePaginationArgs } from '../common/common.resolver';
+import * as prettier from 'prettier';
 
 @Resolver('comparison')
 export class ComparisonResolver {
@@ -39,7 +40,12 @@ export class ComparisonResolver {
       const projectFiles = [];
       for await (const file of files) {
         if (!checkFileType(file.filename, fileTypes)) continue;
-        const data = await streamToBuffer(file.createReadStream());
+        let data = (await streamToBuffer(file.createReadStream())).toString();
+        try {
+          data = prettier.format(data, { parser: 'babel-ts' });
+        } catch (error) {
+          console.log({ error, date: new Date() });
+        }
         const savedFile = await this.filesService.createOne({
           ...file, data, byteLength: Buffer.byteLength(data), createdBy: user,
         });
