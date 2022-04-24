@@ -3,10 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RobotsEntity, RobotsHistoryEntity } from './robots.entity';
 import { CommonEntity } from '../common/common.entity';
-import { MAX_32BIT_INT } from '@diploma-v2/common/constants-common';
+import { BASE_CHROMOSOME, MAX_32BIT_INT } from '@diploma-v2/common/constants-common';
 import { ComparisonsEntity } from '../comparison/comparison.entity';
 import { UsersService } from '../users/users.service';
-import { BASE_CHROMOSOME, makeGeneticCycle } from '@diploma-v2/common/artificial-intelligence';
+import { makeGeneticCycle } from '@diploma-v2/common/artificial-intelligence';
 
 @Injectable()
 export class RobotsService {

@@ -2,6 +2,7 @@ import { Column, Entity, OneToOne, JoinColumn } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { CommonCreatedEntity } from '../common/common.entity';
 import { GraphQLJSON } from 'graphql-type-json';
+import { RobotsChromosome } from '@diploma-v2/common/constants-common';
 
 @ObjectType()
 @Entity('robots')
@@ -12,7 +13,7 @@ export class RobotsEntity extends CommonCreatedEntity {
 
   @Field(() => GraphQLJSON)
   @Column({ type: 'json' })
-  body: any;
+  body: RobotsChromosome;
 
   @Field()
   @Column({ type: 'boolean' })

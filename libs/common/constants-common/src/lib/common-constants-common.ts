@@ -28,16 +28,39 @@ export const POSSIBLE_FILE_TYPES: { [key: string]: string[] } = {
   'TypeScript': ['.ts', '.tsx'],
 };
 
+export enum COMPARING_METHODS {
+  FTC = 'FTC',
+  DLD = 'DLD',
+}
+
 export interface ComparisonResult {
-  // compatibility: number; todo !!!
-  [key: string]: unknown
+  [key: string]: ComparisonProjectResult;
+}
+
+export type RobotsChromosome = { [key in COMPARING_METHODS]: number };
+
+export interface ComparisonProjectResult extends RobotsChromosome {
+  'simplePieces': string[];
+  'percent': number;
 }
 
 export interface CookieTokenDataI {
-	email: string;
-	id: string;
-	iat: number;
-	exp: number;
+  email: string;
+  id: string;
+  iat: number;
+  exp: number;
 }
 
 export const MAX_32BIT_INT = 2 ** 31 - 1;
+export const BASE_CHROMOSOME: RobotsChromosome = {
+  'FTC': 0.5,
+  'DLD': 0.5,
+};
+export const DEFAULT_OPTIONS = {
+  minGeneValue: 0,
+  maxGeneValue: 10,
+  crossoverLine: 1,
+  minMutationsValue: -0.1,
+  maxMutationsValue: 0.1,
+};
+export type makeGeneticCycleOptionT = typeof DEFAULT_OPTIONS;

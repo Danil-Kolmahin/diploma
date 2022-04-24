@@ -1,36 +1,21 @@
-import { asyncify, sum } from '@diploma-v2/common/utils-common';
+import { asyncify } from '@diploma-v2/common/utils-common';
+import {
+  COMPARING_METHODS,
+  ComparisonProjectResult,
+  DEFAULT_OPTIONS,
+  makeGeneticCycleOptionT,
+  RobotsChromosome,
+} from '@diploma-v2/common/constants-common';
 
 const makeRandomWithin = (max = 1, min = 0) => Math.ceil(Math.random() * (max - min - 1)) + min;
 
-export const BASE_CHROMOSOME: Chromosome = {
-  'FTC': 1,
-  'DLD': 1,
-};
-
-const DEFAULT_OPTIONS = {
-  minGeneValue: 1,
-  maxGeneValue: 5,
-  crossoverLine: 2,
-  minMutationsValue: -1,
-  maxMutationsValue: 1,
-};
-
-type makeGeneticCycleOptionT = typeof DEFAULT_OPTIONS;
-
-export const calculateProjectsComparingPercent = (chromosome, comparisonResults): number => {
+export const calculateProjectsComparingPercent = (
+  chromosome: RobotsChromosome, comparisonResults: ComparisonProjectResult,
+): number => {
   let comparisonPercent = 0;
-  // console.log(JSON.stringify(comparisonResults, null, 2));
-  for (const [, comparisonResultValue] of Object.entries(comparisonResults)) {
-    const projectsFilesLengthsSum = (comparisonResultValue as any).filesLengths;
-    for (const [filesKey, filesValue] of Object.entries(comparisonResultValue)) {
-      if (filesKey === 'filesLengths') continue;
-      const filesLengthsSum = filesValue.filesLengths.reduce(sum);
-      const filesLengthsAverageSum = filesLengthsSum / filesValue.filesLengths.length;
-      comparisonPercent += (
-        chromosome.FTC * filesValue.FTC / filesLengthsAverageSum +
-        chromosome.DLD * filesLengthsAverageSum / filesValue.DLD
-      ) * (filesLengthsSum / projectsFilesLengthsSum);
-    }
+  for (const [key, value] of Object.entries(comparisonResults)) {
+    if (Object.values<string>(COMPARING_METHODS).includes(key))
+      comparisonPercent += chromosome[key] * value;
   }
   return comparisonPercent;
 };
@@ -40,14 +25,12 @@ const getDelta = (chromosome, comparisonResults, rightResult: number, abs = true
   return abs ? Math.abs(delta) : delta;
 };
 
-type Chromosome = any;
-
 export const makeGeneticCycle = asyncify((
-  chromosomes: Chromosome[],
+  chromosomes: RobotsChromosome[],
   calculationArgs,
   rightResult: number,
   options: makeGeneticCycleOptionT = DEFAULT_OPTIONS,
-): Chromosome[] => {
+): RobotsChromosome[] => {
   const deltaValues = chromosomes.map(chrome => getDelta(chrome, calculationArgs, rightResult));
 
   // checking if any delta === 0
@@ -79,8 +62,8 @@ export const makeGeneticCycle = asyncify((
   let children = [];
   parents.forEach((_, i) => {
     if (i % 2 === 0) {
-      children[i] = parents[i].slice(0, options.crossoverLine).concat(parents[i + 1].slice(options.crossoverLine));
-      children[i + 1] = parents[i + 1].slice(0, options.crossoverLine).concat(parents[i].slice(options.crossoverLine));
+      // children[i] = parents[i].slice(0, options.crossoverLine).concat(parents[i + 1].slice(options.crossoverLine));
+      // children[i + 1] = parents[i + 1].slice(0, options.crossoverLine).concat(parents[i].slice(options.crossoverLine));
     }
   });
 
@@ -95,12 +78,12 @@ export const makeGeneticCycle = asyncify((
   return children;
 });
 
-const makeMutations = (chromosomes: Chromosome[], options = {
+const makeMutations = (chromosomes: RobotsChromosome[], options = {
   maxMutationsValue: 0,
   minMutationsValue: 0,
   minGeneValue: undefined,
   maxGeneValue: undefined,
-}): Chromosome[] => {
+}): RobotsChromosome[] => {
   const children = [];
   children.forEach((_, i) => {
       if (Math.random() >= 0.5) {

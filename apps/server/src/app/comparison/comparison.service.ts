@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ComparisonsEntity } from './comparison.entity';
 import { CommonEntity } from '../common/common.entity';
 import { UsersEntity } from '../users/users.entity';
-import { MAX_32BIT_INT } from '@diploma-v2/common/constants-common';
+import { ComparisonProjectResult, ComparisonResult, MAX_32BIT_INT } from '@diploma-v2/common/constants-common';
 import { Greedy } from 'string-mismatch';
 import { FilesEntity } from '../files/files.entity';
 import { factorial } from '@diploma-v2/common/utils-common';
@@ -31,7 +31,7 @@ export class ComparisonService {
       where: { createdBy: user },
       skip, take: limit,
       relations: ['projects', 'createdBy', 'projects.files'],
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 
@@ -46,44 +46,47 @@ export class ComparisonService {
   }
 
   async makeComparison(cmp: ComparisonsEntity): Promise<ComparisonsEntity> {
-    const results = {};
+    const results: ComparisonResult = {};
 
     for (let i = 0; i < cmp.projects.length - 1; i++) {
       const curProject = cmp.projects[i];
       for (let j = i + 1; j < cmp.projects.length; j++) {
         const projectToCompare = cmp.projects[j];
         const curProjectPath = `${curProject.id}|${projectToCompare.id}`;
-        results[curProjectPath] = {};
-        results[curProjectPath]['filesLengths'] = 0;
+        results[curProjectPath] = {} as ComparisonProjectResult;
+        results[curProjectPath]['FTC'] = 0;  // Full Text Comparison
+        results[curProjectPath]['simplePieces'] = [];
+        let totalFTCFilesLength = 0;
+        results[curProjectPath]['DLD'] = 0;  // Damerau Levenshtein Distance
+        let totalDLDFilesLength = 0;
 
         for (let ci = 0; ci < curProject.files.length; ci++) {
           for (let cj = 0; cj < projectToCompare.files.length; cj++) {
-            const curFilePath = `${curProject.files[ci].id}|${projectToCompare.files[cj].id}`;
-            results[curProjectPath][curFilePath] = {};
-
             const [simpleStringsLength, newSimplePieces] = await this.fullTextComparison(
               curProject.files[ci], projectToCompare.files[cj],
             );
-            results[curProjectPath][curFilePath]['FTC'] = simpleStringsLength; // Full Text Comparison
-            results[curProjectPath][curFilePath]['simplePieces'] = newSimplePieces;
+            results[curProjectPath]['FTC'] += simpleStringsLength;
+            results[curProjectPath]['simplePieces'] = results[curProjectPath]['simplePieces'].concat(newSimplePieces);
+            totalFTCFilesLength += Math.min(curProject.files[ci].byteLength, projectToCompare.files[cj].byteLength);
 
-            results[curProjectPath][curFilePath]['DLD'] = damerauLevenshtein( // Damerau Levenshtein Distance
-              curProject.files[ci].data.toString(), projectToCompare.files[cj].data.toString()
+            results[curProjectPath]['DLD'] += damerauLevenshtein(
+              curProject.files[ci].data.toString(), projectToCompare.files[cj].data.toString(),
             );
-
-            results[curProjectPath][curFilePath]['filesLengths'] =
-              [curProject.files[ci].byteLength, projectToCompare.files[cj].byteLength];
-
-            if (ci === 0) results[curProjectPath]['filesLengths'] += projectToCompare.files[cj].byteLength;
+            totalDLDFilesLength += Math.max(curProject.files[ci].byteLength, projectToCompare.files[cj].byteLength);
           }
-          results[curProjectPath]['filesLengths'] += curProject.files[ci].byteLength;
         }
+
+        results[curProjectPath]['FTC'] /= totalFTCFilesLength;
+        results[curProjectPath]['DLD'] /= totalDLDFilesLength;
+
+        results[curProjectPath]['percent'] = calculateProjectsComparingPercent(
+          cmp.robot.body, results[curProjectPath],
+        );
 
         cmp.doneOn = 1 / factorial(cmp.projects.length - 1);
         await this.comparisonsEntity.save(cmp);
       }
     }
-    results['percent'] = calculateProjectsComparingPercent(cmp.robot.body, results);
     cmp.doneAt = new Date();
     cmp.doneOn = 1;
     cmp.results = results;
