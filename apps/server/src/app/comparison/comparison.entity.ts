@@ -1,9 +1,10 @@
-import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { Field, Float, ObjectType } from '@nestjs/graphql';
 import { CommonCreatedEntity } from '../common/common.entity';
 import { ComparisonResult } from '@diploma-v2/common/constants-common';
 import { ProjectsEntity } from '../projects/projects.entity';
 import { GraphQLJSON } from 'graphql-type-json';
+import { RobotsEntity } from '../robots/robots.entity';
 
 @ObjectType()
 @Entity('comparisons')
@@ -28,4 +29,8 @@ export class ComparisonsEntity extends CommonCreatedEntity {
   @Field(() => GraphQLJSON, { nullable: true })
   @Column({ type: 'json', nullable: true })
   results?: ComparisonResult;
+
+  @Field(() => RobotsEntity)
+  @ManyToOne(() => RobotsEntity)
+  robot: RobotsEntity;
 }

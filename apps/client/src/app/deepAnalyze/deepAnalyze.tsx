@@ -22,12 +22,14 @@ const MAKE_COMPARISON = gql`
     $projectCreatorNames: [String!]!
     $projectNames: [String!]!
     $projects: [[Upload!]!]!
+    $robotId: String!
   ) {
     makeComparison(
       fileTypes: $fileTypes
       projectCreatorNames: $projectCreatorNames
       projectNames: $projectNames
       projects: $projects
+      robotId: $robotId
     ) {
       id
     }
@@ -75,6 +77,7 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
             projectCreatorNames: [] as string[],
             projectNames: [] as string[],
             projects: [] as File[][],
+            robotId: '5abf9d95-040a-46d0-9065-a72a7bd8be08',
           };
           for (const fileType of form.values.fileTypes) {
             variables.fileTypes = variables.fileTypes.concat(POSSIBLE_FILE_TYPES[fileType]);

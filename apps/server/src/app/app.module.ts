@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { ComparisonModule } from './comparison/comparison.module';
 import { ProjectsModule } from './projects/projects.module';
+import { RobotsModule } from './robots/robots.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ProjectsModule } from './projects/projects.module';
     FilesModule,
     ProjectsModule,
     ComparisonModule,
+    RobotsModule,
   ],
   providers: [],
 })

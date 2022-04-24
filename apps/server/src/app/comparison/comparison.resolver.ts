@@ -13,6 +13,7 @@ import { UsersService } from '../users/users.service';
 import { BasePaginationArgs } from '../common/common.resolver';
 import * as prettier from 'prettier';
 import * as strip from 'strip-comments';
+import { RobotsService } from '../robots/robots.service';
 
 @Resolver('comparison')
 export class ComparisonResolver {
@@ -21,6 +22,7 @@ export class ComparisonResolver {
     private readonly projectsService: ProjectsService,
     private readonly filesService: FilesService,
     private readonly usersService: UsersService,
+    private readonly robotsService: RobotsService,
   ) {
   }
 
@@ -31,6 +33,7 @@ export class ComparisonResolver {
     @Args('projectNames', { type: () => [String] }) projectNames: string[],
     @Args('projectCreatorNames', { type: () => [String] }) projectCreatorNames: string[],
     @Args('fileTypes', { type: () => [String] }) fileTypes: string[],
+    @Args('robotId') robotId: string,
     @Auth() auth: CookieTokenDataI,
   ): Promise<ComparisonsEntity> {
     if (!fileTypes.length) throw new BadRequestException();
@@ -60,6 +63,7 @@ export class ComparisonResolver {
         creatorName: projectCreatorNames[i] || `unknown`,
         files: projectFiles,
         createdBy: user,
+        filesNum: files.length,
       });
       projectsToSave.push(savedProject);
     }
@@ -68,6 +72,7 @@ export class ComparisonResolver {
       fileTypes,
       projects: projectsToSave,
       createdBy: user,
+      robot: await this.robotsService.findOneById(robotId) || this.robotsService.DEFAULT_ROBOT,
     });
     this.comparisonService.makeComparison(createdComparison).then();
     return createdComparison;

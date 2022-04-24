@@ -42,4 +42,21 @@ export const checkFileType = (
 
 export const strToBase16 = (str: string) => parseInt(str, 16).toString();
 
-export const factorial = (n: number): number => n ?  (n * factorial(n-1)) : 1;
+export const factorial = (n: number): number => n ? (n * factorial(n - 1)) : 1;
+
+export const asyncify = (func: (...args: unknown[]) => unknown) => (...args: unknown[]) => new Promise(
+  (resolve, reject) => {
+    try {
+      const result = func(...args);
+      return resolve(result);
+    } catch (e) {
+      return reject(e);
+    }
+  },
+);
+
+export const sum = (x: number, y: number) => x + y;
+
+export const sleep = (ms: number) => new Promise(
+  (resolve) => setTimeout(resolve, ms),
+);

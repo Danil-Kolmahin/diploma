@@ -18,4 +18,8 @@ export class ProjectsEntity extends CommonCreatedEntity {
   @ManyToMany(() => FilesEntity)
   @JoinTable()
   files: FilesEntity[];
+
+  @Field()
+  @Column({ type: 'int' })
+  filesNum: number;
 }

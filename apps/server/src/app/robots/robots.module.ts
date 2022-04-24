@@ -1,24 +1,23 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth/auth.module';
-import { ComparisonsEntity } from './comparison.entity';
-import { ComparisonService } from './comparison.service';
-import { ComparisonResolver } from './comparison.resolver';
+import { RobotsEntity, RobotsHistoryEntity } from './robots.entity';
+import { RobotsService } from './robots.service';
+import { RobotsResolver } from './robots.resolver';
 import { ProjectsModule } from '../projects/projects.module';
 import { FilesModule } from '../files/files.module';
 import { UsersModule } from '../users/users.module';
-import { RobotsModule } from '../robots/robots.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ComparisonsEntity]),
+    TypeOrmModule.forFeature([RobotsEntity, RobotsHistoryEntity]),
     AuthModule,
     FilesModule,
     ProjectsModule,
     UsersModule,
-    RobotsModule,
   ],
-  providers: [ComparisonService, ComparisonResolver],
+  providers: [RobotsService, RobotsResolver],
+  exports: [RobotsService],
 })
-export class ComparisonModule {
+export class RobotsModule {
 }

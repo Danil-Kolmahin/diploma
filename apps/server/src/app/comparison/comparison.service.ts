@@ -9,7 +9,7 @@ import { Greedy } from 'string-mismatch';
 import { FilesEntity } from '../files/files.entity';
 import { factorial } from '@diploma-v2/common/utils-common';
 import { damerauLevenshtein } from '@diploma-v2/common/source-codes-comparing-methods';
-import { ProjectsEntity } from '../projects/projects.entity';
+import { calculateProjectsComparingPercent } from '@diploma-v2/common/artificial-intelligence';
 
 @Injectable()
 export class ComparisonService {
@@ -54,10 +54,11 @@ export class ComparisonService {
         const projectToCompare = cmp.projects[j];
         const curProjectPath = `${curProject.id}|${projectToCompare.id}`;
         results[curProjectPath] = {};
+        results[curProjectPath]['filesLengths'] = 0;
 
         for (let ci = 0; ci < curProject.files.length; ci++) {
           for (let cj = 0; cj < projectToCompare.files.length; cj++) {
-            const curFilePath = `${ curProject.files[ci].id}|${projectToCompare.files[cj].id}`;
+            const curFilePath = `${curProject.files[ci].id}|${projectToCompare.files[cj].id}`;
             results[curProjectPath][curFilePath] = {};
 
             const [simpleStringsLength, newSimplePieces] = await this.fullTextComparison(
@@ -70,15 +71,19 @@ export class ComparisonService {
               curProject.files[ci].data.toString(), projectToCompare.files[cj].data.toString()
             );
 
-            results[curProjectPath][curFilePath]['fileLengths'] =
+            results[curProjectPath][curFilePath]['filesLengths'] =
               [curProject.files[ci].byteLength, projectToCompare.files[cj].byteLength];
+
+            if (ci === 0) results[curProjectPath]['filesLengths'] += projectToCompare.files[cj].byteLength;
           }
+          results[curProjectPath]['filesLengths'] += curProject.files[ci].byteLength;
         }
 
         cmp.doneOn = 1 / factorial(cmp.projects.length - 1);
         await this.comparisonsEntity.save(cmp);
       }
     }
+    results['percent'] = calculateProjectsComparingPercent(cmp.robot.body, results);
     cmp.doneAt = new Date();
     cmp.doneOn = 1;
     cmp.results = results;
