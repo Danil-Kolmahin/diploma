@@ -15,16 +15,16 @@ export class RobotsService {
 
   constructor(
     @InjectRepository(RobotsEntity)
-    private readonly robotsEntity: Repository<RobotsEntity>,
+    private readonly robotsRepository: Repository<RobotsEntity>,
     @InjectRepository(RobotsHistoryEntity)
-    private readonly robotsHistoryEntity: Repository<RobotsHistoryEntity>,
+    private readonly robotsHistoryRepository: Repository<RobotsHistoryEntity>,
     private readonly usersService: UsersService,
   ) {
     this.createDefaultRobot().then();
   }
 
   private async createDefaultRobot(): Promise<void> {
-    this.DEFAULT_ROBOT = await this.robotsEntity.save({
+    this.DEFAULT_ROBOT = await this.robotsRepository.save({
       id: this.DEFAULT_ROBOT_ID,
       createdAt: new Date(0),
       updatedAt: new Date(0),
@@ -36,22 +36,22 @@ export class RobotsService {
   }
 
   async createOne(robot: Omit<RobotsEntity, keyof CommonEntity>): Promise<RobotsEntity> {
-    return this.robotsEntity.save(robot);
+    return this.robotsRepository.save(robot);
   }
 
   async updateOne(
     prevRobot: RobotsEntity,
     newRobot: { name?: string, body?: RobotsChromosome },
   ): Promise<RobotsEntity> {
-    await this.robotsHistoryEntity.save({ ...prevRobot, currentVersion: prevRobot });
+    await this.robotsHistoryRepository.save({ ...prevRobot, currentVersion: prevRobot });
     for (const [key, value] of Object.entries(newRobot)) {
       prevRobot[key] = value;
     }
-    return this.robotsEntity.save(prevRobot);
+    return this.robotsRepository.save(prevRobot);
   }
 
   async findOneById(id: string): Promise<RobotsEntity | null> {
-    return this.robotsEntity.findOne({
+    return this.robotsRepository.findOne({
       where: { id }, relations: ['createdBy'],
     });
   }
@@ -60,7 +60,7 @@ export class RobotsService {
     skip = 0,
     limit = MAX_32BIT_INT,
   } = {}): Promise<RobotsHistoryEntity[]> {
-    return this.robotsHistoryEntity.find({
+    return this.robotsHistoryRepository.find({
       where: { currentVersion: robot },
       skip, take: limit,
       relations: ['createdBy', 'currentVersion'],
@@ -87,6 +87,6 @@ export class RobotsService {
   }
 
   async findAll(): Promise<RobotsEntity[]> {
-    return this.robotsEntity.find();
+    return this.robotsRepository.find();
   }
 }

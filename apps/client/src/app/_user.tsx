@@ -7,8 +7,8 @@ import { convertToHex } from '@diploma-v2/common/utils-common';
 import { APP_THEMES, ROUTES } from '@diploma-v2/common/constants-common';
 
 const LOGOUT = gql`
-  mutation logout {
-    logout
+  mutation signOut {
+    signOut
   }
 `;
 

@@ -27,7 +27,7 @@ export class AuthResolver {
   }
 
   @Mutation(() => Boolean)
-  async login(
+  async signIn(
     @Args('', new ValidationPipe()) userArgs: BaseUserArgs,
     @GQLRequest() request,
   ): Promise<true | never> {
@@ -44,7 +44,7 @@ export class AuthResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(GqlAuthGuard)
-  async logout(@GQLRequest() request): Promise<true> {
+  async signOut(@GQLRequest() request): Promise<true> {
     request.res.clearCookie(process.env.NX_AUTH_COOKIE_NAME);
     return true;
   }

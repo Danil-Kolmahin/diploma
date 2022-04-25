@@ -18,11 +18,11 @@ import { gql, useMutation } from '@apollo/client';
 import { APP_THEMES, DEFAULT_REDIRECT_ROUTE, ROUTES } from '@diploma-v2/common/constants-common';
 
 const CREATE_NEW_USER = gql`
-  mutation signup (
+  mutation signUp (
     $email: String!
     $password: String!
   ) {
-    signup(
+    signUp(
       email: $email
       password: $password
     ) {
@@ -32,11 +32,11 @@ const CREATE_NEW_USER = gql`
 `;
 
 const LOGIN = gql`
-  mutation login (
+  mutation signIn (
     $email: String!
     $password: String!
   ) {
-    login(
+    signIn(
       email: $email
       password: $password
     )

@@ -15,7 +15,7 @@ import * as prettier from 'prettier';
 import * as strip from 'strip-comments';
 import { RobotsService } from '../robots/robots.service';
 
-@Resolver('comparison')
+@Resolver()
 export class ComparisonResolver {
   constructor(
     private readonly comparisonService: ComparisonService,

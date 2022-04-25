@@ -29,7 +29,7 @@ export class HighLevelAuthResolver {
   }
 
   @Mutation(() => UsersEntity)
-  async signup(@Args('', new ValidationPipe()) user: BaseUserArgs): Promise<UsersEntity> {
+  async signUp(@Args('', new ValidationPipe()) user: BaseUserArgs): Promise<UsersEntity> {
     let savedUser;
     try {
       savedUser = await this.usersService.createOne(Object.assign(user, {

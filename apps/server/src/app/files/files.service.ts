@@ -12,10 +12,6 @@ export class FilesService {
   ) {
   }
 
-  async findOneById(id: string): Promise<FilesEntity | undefined> {
-    return this.filesRepository.findOne({ id });
-  }
-
   async createOne(file: Omit<FilesEntity, keyof CommonEntity>): Promise<FilesEntity> {
     return this.filesRepository.save(file);
   }

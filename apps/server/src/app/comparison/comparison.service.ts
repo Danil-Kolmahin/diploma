@@ -15,19 +15,19 @@ import { calculateProjectsComparingPercent } from '@diploma-v2/common/artificial
 export class ComparisonService {
   constructor(
     @InjectRepository(ComparisonsEntity)
-    private readonly comparisonsEntity: Repository<ComparisonsEntity>,
+    private readonly comparisonsRepository: Repository<ComparisonsEntity>,
   ) {
   }
 
   async createOne(comparison: Omit<ComparisonsEntity, keyof CommonEntity>): Promise<ComparisonsEntity> {
-    return this.comparisonsEntity.save(comparison);
+    return this.comparisonsRepository.save(comparison);
   }
 
   async findAllByUserPG(user: UsersEntity, {
     skip = 0,
     limit = MAX_32BIT_INT,
   } = {}): Promise<ComparisonsEntity[]> {
-    return this.comparisonsEntity.find({
+    return this.comparisonsRepository.find({
       where: { createdBy: user },
       skip, take: limit,
       relations: ['projects', 'createdBy', 'projects.files'],
@@ -36,11 +36,11 @@ export class ComparisonService {
   }
 
   async getCountByUser(user: UsersEntity): Promise<number> {
-    return this.comparisonsEntity.count({ createdBy: user });
+    return this.comparisonsRepository.count({ createdBy: user });
   }
 
   async findOneById(id: string): Promise<ComparisonsEntity | null> {
-    return this.comparisonsEntity.findOne({
+    return this.comparisonsRepository.findOne({
       where: { id }, relations: ['projects', 'createdBy', 'projects.files'],
     });
   }
@@ -84,13 +84,13 @@ export class ComparisonService {
         );
 
         cmp.doneOn = 1 / factorial(cmp.projects.length - 1);
-        await this.comparisonsEntity.save(cmp);
+        await this.comparisonsRepository.save(cmp);
       }
     }
     cmp.doneAt = new Date();
     cmp.doneOn = 1;
     cmp.results = results;
-    return this.comparisonsEntity.save(cmp);
+    return this.comparisonsRepository.save(cmp);
   }
 
   async fullTextComparison(file1: FilesEntity, file2: FilesEntity): Promise<[number, string[]]> {
