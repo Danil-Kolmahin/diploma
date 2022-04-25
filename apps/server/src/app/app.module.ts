@@ -8,6 +8,7 @@ import { FilesModule } from './files/files.module';
 import { ComparisonModule } from './comparison/comparison.module';
 import { ProjectsModule } from './projects/projects.module';
 import { RobotsModule } from './robots/robots.module';
+import { HighLevelAuthModule } from './highLevelAuth/highLevelAuth.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { RobotsModule } from './robots/robots.module';
     ProjectsModule,
     ComparisonModule,
     RobotsModule,
+    HighLevelAuthModule,
   ],
   providers: [],
 })

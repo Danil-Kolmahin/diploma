@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RobotsEntity, RobotsHistoryEntity } from './robots.entity';
 import { CommonEntity } from '../common/common.entity';
-import { BASE_CHROMOSOME, MAX_32BIT_INT } from '@diploma-v2/common/constants-common';
+import { BASE_CHROMOSOME, DEFAULT_OPTIONS, MAX_32BIT_INT, RobotsChromosome } from '@diploma-v2/common/constants-common';
 import { ComparisonsEntity } from '../comparison/comparison.entity';
 import { UsersService } from '../users/users.service';
 import { makeGeneticCycle } from '@diploma-v2/common/artificial-intelligence';
@@ -41,7 +41,7 @@ export class RobotsService {
 
   async updateOne(
     prevRobot: RobotsEntity,
-    newRobot: { name?: string, body?: any },
+    newRobot: { name?: string, body?: RobotsChromosome },
   ): Promise<RobotsEntity> {
     await this.robotsHistoryEntity.save({ ...prevRobot, currentVersion: prevRobot });
     for (const [key, value] of Object.entries(newRobot)) {
@@ -78,10 +78,15 @@ export class RobotsService {
     return this.updateOne(robot, {
       ...robot,
       body: await makeGeneticCycle(
-        [robot.body, ...prevRobots],
+        [robot.body, ...(prevRobots.map(r => r.body))],
         comparison.results,
         rightResult,
-      ),
+        DEFAULT_OPTIONS, // todo use users options
+      ) as RobotsChromosome,
     });
+  }
+
+  async findAll(): Promise<RobotsEntity[]> {
+    return this.robotsEntity.find();
   }
 }

@@ -1,4 +1,4 @@
-import { asyncify } from '@diploma-v2/common/utils-common';
+import { promisify } from 'util';
 import {
   COMPARING_METHODS,
   ComparisonProjectResult,
@@ -25,24 +25,24 @@ const getDelta = (chromosome, comparisonResults, rightResult: number, abs = true
   return abs ? Math.abs(delta) : delta;
 };
 
-export const makeGeneticCycle = asyncify((
+export const makeGeneticCycle = promisify((
   chromosomes: RobotsChromosome[],
   calculationArgs,
   rightResult: number,
   options: makeGeneticCycleOptionT = DEFAULT_OPTIONS,
-): RobotsChromosome[] => {
+): RobotsChromosome => {
   const deltaValues = chromosomes.map(chrome => getDelta(chrome, calculationArgs, rightResult));
 
   // checking if any delta === 0
   const findResult = chromosomes.find((_, i) => deltaValues[i] === 0);
-  if (findResult) return chromosomes;
+  if (findResult) return findResult;
 
   if (chromosomes.length === 1) return makeMutations(chromosomes, {
     maxMutationsValue: options.maxMutationsValue,
     minMutationsValue: options.minMutationsValue,
     minGeneValue: options.minGeneValue,
     maxGeneValue: options.maxGeneValue,
-  });
+  })[0];
 
   // calculating the chances of becoming a parent
   const parentChances = deltaValues.map(delta => 1 / delta);
@@ -59,7 +59,7 @@ export const makeGeneticCycle = asyncify((
   );
 
   // crossbreeding
-  let children = [];
+  let children: RobotsChromosome[] = [];
   parents.forEach((_, i) => {
     if (i % 2 === 0) {
       // children[i] = parents[i].slice(0, options.crossoverLine).concat(parents[i + 1].slice(options.crossoverLine));
@@ -75,7 +75,10 @@ export const makeGeneticCycle = asyncify((
     maxGeneValue: options.maxGeneValue,
   });
 
-  return children;
+  return children.sort((a, b) =>
+    getDelta(b, calculationArgs, rightResult) -
+    getDelta(a, calculationArgs, rightResult),
+  )[0];
 });
 
 const makeMutations = (chromosomes: RobotsChromosome[], options = {

@@ -10,11 +10,11 @@ export class AuthService {
   }
 
   async getHash(password: string): Promise<string> {
-    return hash(password, parseInt(process.env.JWT_SALT_ROUNDS, 10))
+    return hash(password, parseInt(process.env.JWT_SALT_ROUNDS, 10));
   }
 
   async compareHash(
-    candidatePassword: string, passwordHash: string
+    candidatePassword: string, passwordHash: string,
   ): Promise<boolean> {
     return compare(candidatePassword, passwordHash);
   }
