@@ -2,15 +2,17 @@ import { Args, ArgsType, Field, Mutation, Query, Resolver } from '@nestjs/graphq
 import { RobotsService } from './robots.service';
 import { RobotsEntity } from './robots.entity';
 import { CommonCreatedEntity } from '../common/common.entity';
-import { Auth } from '../auth/gql.auth-guard';
+import { Auth, GqlAuthGuard } from '../auth/gql.auth-guard';
 import { CookieTokenDataI, RobotsChromosome } from '@diploma-v2/common/constants-common';
 import { UsersService } from '../users/users.service';
 import { GraphQLJSON } from 'graphql-type-json';
-import { ValidationPipe } from '@nestjs/common';
+import { UseGuards, ValidationPipe } from '@nestjs/common';
+import { IsJSON } from 'class-validator';
 
 @ArgsType()
-class RobotArg implements Omit<RobotsEntity, keyof CommonCreatedEntity> {
+class RobotArgs implements Omit<RobotsEntity, keyof CommonCreatedEntity> {
   @Field(() => GraphQLJSON)
+  @IsJSON()
   body: RobotsChromosome;
 
   @Field()
@@ -28,14 +30,17 @@ export class RobotsResolver {
   ) {
   }
 
-  @Query(() => [RobotsEntity])
-  async findAllRobots(): Promise<RobotsEntity[]> {
-    return this.robotsService.findAll();
+  @Query(() => [RobotsEntity], { nullable: 'items' })
+  @UseGuards(GqlAuthGuard)
+  async findAllRobots(@Auth() auth: CookieTokenDataI): Promise<RobotsEntity[]> {
+    const user = await this.usersService.findOneById(auth.id);
+    return this.robotsService.findAll(user);
   }
 
   @Mutation(() => RobotsEntity)
+  @UseGuards(GqlAuthGuard)
   async createRobot(
-    @Args('', new ValidationPipe()) robot: RobotArg,
+    @Args('', new ValidationPipe()) robot: RobotArgs,
     @Auth() auth: CookieTokenDataI,
   ): Promise<RobotsEntity> {
     const user = await this.usersService.findOneById(auth.id);

@@ -7,6 +7,7 @@ import { BASE_CHROMOSOME, DEFAULT_OPTIONS, MAX_32BIT_INT, RobotsChromosome } fro
 import { ComparisonsEntity } from '../comparison/comparison.entity';
 import { UsersService } from '../users/users.service';
 import { makeGeneticCycle } from '@diploma-v2/common/artificial-intelligence';
+import { UsersEntity } from '../users/users.entity';
 
 @Injectable()
 export class RobotsService {
@@ -86,7 +87,7 @@ export class RobotsService {
     });
   }
 
-  async findAll(): Promise<RobotsEntity[]> {
-    return this.robotsRepository.find();
+  async findAll(user: UsersEntity): Promise<RobotsEntity[]> {
+    return this.robotsRepository.find({ createdBy: user });
   }
 }

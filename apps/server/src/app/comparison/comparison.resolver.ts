@@ -10,7 +10,7 @@ import { ProjectsService } from '../projects/projects.service';
 import { checkFileType } from '@diploma-v2/common/utils-common';
 import { CookieTokenDataI } from '@diploma-v2/common/constants-common';
 import { UsersService } from '../users/users.service';
-import { BasePaginationArgs } from '../common/common.resolver';
+import { BaseIdArgs, BasePaginationArgs } from '../common/common.resolver';
 import * as prettier from 'prettier';
 import * as strip from 'strip-comments';
 import { RobotsService } from '../robots/robots.service';
@@ -78,7 +78,8 @@ export class ComparisonResolver {
     return createdComparison;
   }
 
-  @Query(() => [ComparisonsEntity])
+  @Query(() => [ComparisonsEntity], { nullable: 'items' })
+  @UseGuards(GqlAuthGuard)
   async findAllComparisons(
     @Args('', new ValidationPipe()) basePG: BasePaginationArgs,
     @Auth() auth: CookieTokenDataI,
@@ -88,6 +89,7 @@ export class ComparisonResolver {
   }
 
   @Query(() => Int)
+  @UseGuards(GqlAuthGuard)
   async getComparisonsCount(
     @Auth() auth: CookieTokenDataI,
   ): Promise<number> {
@@ -97,7 +99,7 @@ export class ComparisonResolver {
 
   @Query(() => ComparisonsEntity, { nullable: true })
   async findComparisonById(
-    @Args('id') id: string,
+    @Args('', new ValidationPipe()) { id }: BaseIdArgs,
   ): Promise<ComparisonsEntity | null> {
     return this.comparisonService.findOneById(id);
   }
