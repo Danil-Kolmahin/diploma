@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RobotsEntity, RobotsHistoryEntity } from './robots.entity';
@@ -89,5 +89,9 @@ export class RobotsService {
 
   async findAll(user: UsersEntity): Promise<RobotsEntity[]> {
     return this.robotsRepository.find({ createdBy: user });
+  }
+
+  async deleteOne(id: string): Promise<DeleteResult> {
+    return this.robotsRepository.delete({ id });
   }
 }

@@ -8,6 +8,7 @@ import { UsersService } from '../users/users.service';
 import { GraphQLJSON } from 'graphql-type-json';
 import { UseGuards, ValidationPipe } from '@nestjs/common';
 import { IsJSON } from 'class-validator';
+import { BaseIdArgs } from '../common/common.resolver';
 
 @ArgsType()
 class RobotArgs implements Omit<RobotsEntity, keyof CommonCreatedEntity> {
@@ -20,6 +21,19 @@ class RobotArgs implements Omit<RobotsEntity, keyof CommonCreatedEntity> {
 
   @Field()
   name: string;
+}
+
+@ArgsType()
+class RobotOptionalArgs {
+  @Field(() => GraphQLJSON, { nullable: true })
+  @IsJSON()
+  body?: RobotsChromosome;
+
+  @Field({ nullable: true })
+  growable?: boolean;
+
+  @Field({ nullable: true })
+  name?: string;
 }
 
 @Resolver()
@@ -45,5 +59,24 @@ export class RobotsResolver {
   ): Promise<RobotsEntity> {
     const user = await this.usersService.findOneById(auth.id);
     return this.robotsService.createOne({ ...robot, createdBy: user });
+  }
+
+  @Mutation(() => RobotsEntity)
+  @UseGuards(GqlAuthGuard)
+  async updateRobot(
+    @Args('', new ValidationPipe()) { id }: BaseIdArgs,
+    @Args('', new ValidationPipe()) robot: RobotOptionalArgs,
+  ): Promise<RobotsEntity> {
+    const oldRobot = await this.robotsService.findOneById(id);
+    return this.robotsService.updateOne(oldRobot, { ...robot });
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
+  async deleteRobot(
+    @Args('', new ValidationPipe()) { id }: BaseIdArgs,
+  ): Promise<true> {
+    await this.robotsService.deleteOne(id);
+    return true;
   }
 }

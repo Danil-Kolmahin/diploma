@@ -1,4 +1,4 @@
-import { Query, Resolver } from '@nestjs/graphql';
+import { Mutation, Resolver } from '@nestjs/graphql';
 import { OtherService } from './other.service';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../auth/gql.auth-guard';
@@ -10,7 +10,7 @@ export class OtherResolver {
   ) {
   }
 
-  @Query(() => String)
+  @Mutation(() => String)
   @UseGuards(GqlAuthGuard)
   async getRandomMaleName(): Promise<string> {
     return this.otherService.getRandomMaleName();
