@@ -11,10 +11,10 @@ const parseJwt = (token: string) => {
 };
 
 const EMPTY_COOKIES: CookieTokenDataI = {
-  id: '01234567-0123-0123-0123-01234567',
   email: 'unknown@email.com',
-  exp: 0,
+  id: '01234567-0123-0123-0123-01234567',
   iat: 0,
+  exp: 0,
 };
 
 export const withAuth = (WrappedComponent: React.ComponentType, shouldAuth = true) => {
@@ -30,7 +30,8 @@ export const withAuth = (WrappedComponent: React.ComponentType, shouldAuth = tru
           parsedCookie &&
           isObject(parsedCookie) &&
           !!(parsedCookie as CookieTokenDataI).id &&
-          !!(parsedCookie as CookieTokenDataI).email
+          !!(parsedCookie as CookieTokenDataI).email &&
+          (parsedCookie as CookieTokenDataI).exp * 1000 > Date.now()
         ) {
           return parsedCookie;
         } else {
@@ -51,7 +52,8 @@ export const withAuth = (WrappedComponent: React.ComponentType, shouldAuth = tru
         if (parsedCookie) {
           return isObject(parsedCookie) &&
             !!(parsedCookie as CookieTokenDataI).id &&
-            !!(parsedCookie as CookieTokenDataI).email;
+            !!(parsedCookie as CookieTokenDataI).email &&
+            (parsedCookie as CookieTokenDataI).exp * 1000 > Date.now();
         } else {
           return false;
         }
@@ -72,7 +74,8 @@ export const withAuth = (WrappedComponent: React.ComponentType, shouldAuth = tru
             setIsAuthorised(
               isObject(parsedCookie) &&
               !!(parsedCookie as CookieTokenDataI).id &&
-              !!(parsedCookie as CookieTokenDataI).email,
+              !!(parsedCookie as CookieTokenDataI).email &&
+              (parsedCookie as CookieTokenDataI).exp * 1000 > Date.now(),
             );
             setCookie(parsedCookie);
           } else {
@@ -83,7 +86,7 @@ export const withAuth = (WrappedComponent: React.ComponentType, shouldAuth = tru
           setCookie(EMPTY_COOKIES);
           setIsAuthorised(false);
         }
-      }, 15000)
+      }, 15000);
       return () => clearInterval(intervalId);
     }, []);
 
