@@ -13,6 +13,7 @@ export enum ROUTES {
   SIMPLE_DIFF = '/simpleDifference',
   DEEP_ANALYZE = '/deepAnalyze',
   HISTORY = '/history',
+  ROBOTS = '/robots',
 }
 
 export const DEFAULT_REDIRECT_ROUTE = ROUTES.SIMPLE_DIFF;

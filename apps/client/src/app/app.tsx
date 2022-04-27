@@ -14,6 +14,7 @@ import { DeepAnalyze } from './deepAnalyze/deepAnalyze';
 import { NotificationsProvider } from '@mantine/notifications';
 import { History } from './history/history';
 import { HistoryElem } from './history/history.elem';
+import { Robots } from './robots/robots';
 
 // const StyledApp = styled.div`
 //   // Your style here
@@ -25,6 +26,7 @@ const AuthDeepAnalyze = withAuth(DeepAnalyze);
 const AuthHistory = withAuth(History);
 const AuthHistoryElement = withAuth(HistoryElem);
 const AuthNotFound = withAuth(NotFound);
+const AuthRobots = withAuth(Robots);
 
 export function App() {
   const [colorScheme, setColorScheme] = useState<ColorScheme>(() => {
@@ -62,6 +64,7 @@ export function App() {
             <Route path={ROUTES.DEEP_ANALYZE} element={<AuthDeepAnalyze />} />
             <Route path={ROUTES.HISTORY} element={<AuthHistory />} />
             <Route path={`${ROUTES.HISTORY}/:id`} element={<AuthHistoryElement />} />
+            <Route path={ROUTES.ROBOTS} element={<AuthRobots />} />
             <Route path={'*'} element={<AuthNotFound />} />
           </Routes>
         </NotificationsProvider>

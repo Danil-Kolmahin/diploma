@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, FileDiff, History, FileCertificate } from 'tabler-icons-react';
+import { Settings, FileDiff, History, FileCertificate, Tournament } from 'tabler-icons-react';
 import { ThemeIcon, UnstyledButton, Group, Text } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { APP_THEMES, ROUTES } from '@diploma-v2/common/constants-common';
@@ -13,6 +13,7 @@ export function MainLinks() {
         { icon: <FileDiff size={16} />, color: 'orange', label: 'Simple difference', url: ROUTES.SIMPLE_DIFF },
         { icon: <FileCertificate size={16} />, color: 'yellow', label: 'Deep analyze', url: ROUTES.DEEP_ANALYZE },
         { icon: <History size={16} />, color: 'teal', label: 'History', url: ROUTES.HISTORY },
+        { icon: <Tournament size={16} />, color: 'violet', label: 'Robots', url: ROUTES.ROBOTS },
         { icon: <Settings size={16} />, color: 'green', label: 'Settings', url: ROUTES.SETTINGS },
       ]
         .map(({ icon, color, label, url }) => <UnstyledButton
