@@ -9,6 +9,7 @@ import { ComparisonModule } from './comparison/comparison.module';
 import { ProjectsModule } from './projects/projects.module';
 import { RobotsModule } from './robots/robots.module';
 import { HighLevelAuthModule } from './highLevelAuth/highLevelAuth.module';
+import { OtherModule } from './other/other.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { HighLevelAuthModule } from './highLevelAuth/highLevelAuth.module';
     ComparisonModule,
     RobotsModule,
     HighLevelAuthModule,
+    OtherModule,
   ],
   providers: [],
 })
