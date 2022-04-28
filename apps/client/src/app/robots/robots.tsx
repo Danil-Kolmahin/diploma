@@ -9,7 +9,7 @@ import {
   Paper,
   Text,
   useMantineTheme,
-  JsonInput, Button, Switch,
+  JsonInput, Button, Switch, Stack,
 } from '@mantine/core';
 import { MainLinks } from '../_mainLinks';
 import { Logo } from '../_logo';
@@ -161,48 +161,56 @@ export const Robots = ({ parsedCookie }: any) => {
                   });
                   form.validate();
                 }}
+                minRows={form.values.robots[index]?.body ?
+                  form.values.robots[index]?.body.split(/\r?\n/).length
+                  : 3}
+                maxRows={form.values.robots[index]?.body ?
+                  form.values.robots[index]?.body.split(/\r?\n/).length
+                  : 3}
               />
             </Grid.Col>
             <Grid.Col span={4}>
-              <ActionIcon
-                color='red'
-                variant='hover'
-                disabled={data.findAllRobots.length <= 1}
-                onClick={async () => {
-                  await deleteRobot({
-                    variables: { id: robot.id },
+              <Stack align='flex-end'>
+                <ActionIcon
+                  color='red'
+                  variant='hover'
+                  disabled={data.findAllRobots.length <= 1}
+                  onClick={async () => {
+                    await deleteRobot({
+                      variables: { id: robot.id },
+                    });
+                    await refetch();
+                  }}
+                >
+                  <Trash size={20} />
+                </ActionIcon>
+                <Switch
+                  label='Is growable'
+                  {...form.getListInputProps('robots', index, 'growable')}
+                  checked={form.values.robots[index]?.growable || false}
+                  onChange={(event) => {
+                    const nextValue = form.values.robots[index].growable
+                      ? !(event.target.value === 'on')
+                      : !(event.target.value === 'off');
+                    form.setValues((prev) => {
+                      prev.robots.forEach((robot: Robot, i: number) => {
+                        if (index === i) prev.robots[i] = {
+                          ...robot,
+                          growable: nextValue,
+                        };
+                      });
+                      return prev;
+                    });
+                    form.validate();
+                  }}
+                />
+                <Button onClick={async () => {
+                  await updateRobot({
+                    variables: { ...form.values.robots[index] },
                   });
                   await refetch();
-                }}
-              >
-                <Trash size={20} />
-              </ActionIcon>
-              <Switch
-                label='Is growable'
-                {...form.getListInputProps('robots', index, 'growable')}
-                checked={form.values.robots[index]?.growable || false}
-                onChange={(event) => {
-                  const nextValue = form.values.robots[index].growable
-                    ? !(event.target.value === 'on')
-                    : !(event.target.value === 'off');
-                  form.setValues((prev) => {
-                    prev.robots.forEach((robot: Robot, i: number) => {
-                      if (index === i) prev.robots[i] = {
-                        ...robot,
-                        growable: nextValue,
-                      };
-                    });
-                    return prev;
-                  });
-                  form.validate();
-                }}
-              />
-              <Button onClick={async () => {
-                await updateRobot({
-                  variables: { ...form.values.robots[index] },
-                });
-                await refetch();
-              }}>Submit</Button>
+                }}>Submit</Button>
+              </Stack>
             </Grid.Col>
           </Grid>
         </Paper>)}
