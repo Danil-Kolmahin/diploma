@@ -14,11 +14,12 @@ import {
 import { MainLinks } from '../_mainLinks';
 import { Logo } from '../_logo';
 import { User } from '../_user';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { OopsPage } from '../common/OopsPage';
 import { Trash } from 'tabler-icons-react';
 import { BASE_CHROMOSOME } from '@diploma-v2/common/constants-common';
+import { formList, useForm } from '@mantine/form';
 
 const FIND_ALL_ROBOTS = gql`
   query {
@@ -83,10 +84,18 @@ const GET_RANDOM_MALE_NAME = gql`
   }
 `;
 
+type Robot = {
+  name: string,
+  growable: boolean,
+  body: string,
+  id: string,
+}
+
 export const Robots = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
-  const [robotContents, setRobotContents] = useState<string[]>([]);
-  const [robotIsGrows, setRobotIsGrows] = useState<boolean[]>([]);
+  const form = useForm({
+    initialValues: { robots: formList<Robot>([]) },
+  });
   const { loading, error, data, refetch } = useQuery(FIND_ALL_ROBOTS);
   const [updateRobot] = useMutation(UPDATE_ROBOT);
   const [deleteRobot] = useMutation(DELETE_ROBOT);
@@ -94,8 +103,14 @@ export const Robots = ({ parsedCookie }: any) => {
   const [getRandomMaleName] = useMutation(GET_RANDOM_MALE_NAME);
 
   useEffect(() => {
-    data && setRobotContents(data.findAllRobots.map((robot: any) => robot.body));
-    data && setRobotIsGrows(data.findAllRobots.map((robot: any) => robot.growable));
+    data && form.setValues((prev) => {
+      prev.robots = data.findAllRobots.map((robot: Robot) => ({
+        ...robot,
+        body: JSON.stringify(robot.body, null, 2),
+      }));
+      return prev;
+    });
+    form.validate();
   }, [data]);
 
   return <AppShell
@@ -116,7 +131,7 @@ export const Robots = ({ parsedCookie }: any) => {
   >
 
     {loading ? <Loader /> : error ? <OopsPage /> : <>
-      {(data.findAllRobots as any[])
+      {(data.findAllRobots as Robot[])
         .map((robot, index) => <Paper
           shadow='xs'
           p='md'
@@ -132,11 +147,20 @@ export const Robots = ({ parsedCookie }: any) => {
             <Grid.Col span={8}>
               <JsonInput
                 variant='filled'
-                value={robotContents[index]}
-                onChange={(value) => setRobotContents((prev) => {
-                  prev[index] = value;
-                  return prev;
-                })}
+                {...form.getListInputProps('robots', index, 'body')}
+                value={form.values.robots[index]?.body}
+                onChange={(value) => {
+                  form.setValues((prev) => {
+                    prev.robots.forEach((robot: Robot, i: number) => {
+                      if (index === i) prev.robots[i] = {
+                        ...robot,
+                        body: value,
+                      };
+                    });
+                    return prev;
+                  });
+                  form.validate();
+                }}
               />
             </Grid.Col>
             <Grid.Col span={4}>
@@ -155,18 +179,27 @@ export const Robots = ({ parsedCookie }: any) => {
               </ActionIcon>
               <Switch
                 label='Is growable'
-                checked={robotIsGrows[index] || false}
-                onChange={(event) => setRobotIsGrows((prev) => {
-                  prev[index] = prev[index] ? !(event.target.value === 'on') : !(event.target.value === 'off');
-                  return prev;
-                })}
+                {...form.getListInputProps('robots', index, 'growable')}
+                checked={form.values.robots[index]?.growable || false}
+                onChange={(event) => {
+                  const nextValue = form.values.robots[index].growable
+                    ? !(event.target.value === 'on')
+                    : !(event.target.value === 'off');
+                  form.setValues((prev) => {
+                    prev.robots.forEach((robot: Robot, i: number) => {
+                      if (index === i) prev.robots[i] = {
+                        ...robot,
+                        growable: nextValue,
+                      };
+                    });
+                    return prev;
+                  });
+                  form.validate();
+                }}
               />
               <Button onClick={async () => {
                 await updateRobot({
-                  variables: {
-                    body: robotContents[index],
-                    id: robot.id,
-                  },
+                  variables: { ...form.values.robots[index] },
                 });
                 await refetch();
               }}>Submit</Button>
@@ -185,7 +218,7 @@ export const Robots = ({ parsedCookie }: any) => {
           await refetch();
         }}
       >
-        Add one more
+        Update
       </Button>
     </>
     }

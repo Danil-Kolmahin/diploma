@@ -88,10 +88,16 @@ export class RobotsService {
   }
 
   async findAll(user: UsersEntity): Promise<RobotsEntity[]> {
-    return this.robotsRepository.find({ createdBy: user });
+    return this.robotsRepository.find({
+      where: { createdBy: user },
+      order: { createdAt: 'ASC' },
+    });
   }
 
   async deleteOne(id: string): Promise<DeleteResult> {
+    await this.robotsHistoryRepository.delete({
+      currentVersion: await this.findOneById(id),
+    })
     return this.robotsRepository.delete({ id });
   }
 }

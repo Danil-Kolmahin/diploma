@@ -1,9 +1,8 @@
 import { Args, ArgsType, Field, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { RobotsService } from './robots.service';
 import { RobotsEntity } from './robots.entity';
-import { CommonCreatedEntity } from '../common/common.entity';
 import { Auth, GqlAuthGuard } from '../auth/gql.auth-guard';
-import { CookieTokenDataI, RobotsChromosome } from '@diploma-v2/common/constants-common';
+import { CookieTokenDataI } from '@diploma-v2/common/constants-common';
 import { UsersService } from '../users/users.service';
 import { GraphQLJSON } from 'graphql-type-json';
 import { UseGuards, ValidationPipe } from '@nestjs/common';
@@ -11,10 +10,10 @@ import { IsJSON } from 'class-validator';
 import { BaseIdArgs } from '../common/common.resolver';
 
 @ArgsType()
-class RobotArgs implements Omit<RobotsEntity, keyof CommonCreatedEntity> {
+class RobotArgs {
   @Field(() => GraphQLJSON)
   @IsJSON()
-  body: RobotsChromosome;
+  body: string; // TODO auto convert to object
 
   @Field()
   growable: boolean;
@@ -27,7 +26,7 @@ class RobotArgs implements Omit<RobotsEntity, keyof CommonCreatedEntity> {
 class RobotOptionalArgs {
   @Field(() => GraphQLJSON, { nullable: true })
   @IsJSON()
-  body?: RobotsChromosome;
+  body?: string;
 
   @Field({ nullable: true })
   growable?: boolean;
@@ -58,7 +57,11 @@ export class RobotsResolver {
     @Auth() auth: CookieTokenDataI,
   ): Promise<RobotsEntity> {
     const user = await this.usersService.findOneById(auth.id);
-    return this.robotsService.createOne({ ...robot, createdBy: user });
+    return this.robotsService.createOne({
+      ...robot,
+      createdBy: user,
+      body: JSON.parse(robot.body),
+    });
   }
 
   @Mutation(() => RobotsEntity)
@@ -68,7 +71,10 @@ export class RobotsResolver {
     @Args('', new ValidationPipe()) robot: RobotOptionalArgs,
   ): Promise<RobotsEntity> {
     const oldRobot = await this.robotsService.findOneById(id);
-    return this.robotsService.updateOne(oldRobot, { ...robot });
+    return this.robotsService.updateOne(oldRobot, {
+      ...robot,
+      body: JSON.parse(robot.body),
+    });
   }
 
   @Mutation(() => Boolean)
