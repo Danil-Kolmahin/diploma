@@ -3,18 +3,19 @@ import {
   Button,
   MultiSelect,
   ActionIcon,
-  TextInput, Chip, Chips, Grid, Center,
+  TextInput, Chip, Chips, Grid, Center, Loader, Select,
 } from '@mantine/core';
 import { MainLinks } from '../_mainLinks';
 import { Logo } from '../_logo';
 import { User } from '../_user';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Files, File, Folder, NewSection, Trash } from 'tabler-icons-react';
 import { formList, useForm } from '@mantine/form';
 import { renameFile } from '@diploma-v2/frontend/utils-frontend';
 import { POSSIBLE_FILE_TYPES, ROUTES } from '@diploma-v2/common/constants-common';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
+import { OopsPage } from '../common/OopsPage';
 
 const MAKE_COMPARISON = gql`
   mutation(
@@ -36,11 +37,25 @@ const MAKE_COMPARISON = gql`
   }
 `;
 
+const FIND_ALL_ROBOTS = gql`
+  query {
+    findAllRobots {
+      body
+      createdAt
+      growable
+      id
+      name
+      updatedAt
+    }
+  }
+`;
+
 export const DeepAnalyze = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
   const refs = useRef([]);
   const [isFileSearch, setIsFileSearch] = useState(true);
   const navigate = useNavigate();
+  const { loading, error, data } = useQuery(FIND_ALL_ROBOTS);
   const form = useForm({
     initialValues: {
       projects: formList<{ name: string, creatorName: string, files: File[] }>([
@@ -48,9 +63,20 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
         { name: 'Project #2', creatorName: 'unknown', files: [] },
       ]),
       fileTypes: Object.keys(POSSIBLE_FILE_TYPES),
+      robot: data ?
+        data.findAllRobots.find((robot: any) => robot.name === 'Default').id
+        : undefined,
     },
   });
   const [makeComparison] = useMutation(MAKE_COMPARISON);
+
+  useEffect(() => {
+    data && form.setValues((prevState) => {
+      prevState.robot = data.findAllRobots.find((robot: any) => robot.name === 'Default').id;
+      return prevState;
+    });
+    form.clearErrors();
+  }, [data])
 
   return <AppShell
     fixed
@@ -68,7 +94,7 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
       </Header>
     }
   >
-    <Grid justify='space-around'>
+    {loading ? <Loader /> : error ? <OopsPage /> : <Grid justify='space-around'>
       <Grid.Col span={3}><Center><Button
         color={'green'}
         onClick={async () => {
@@ -77,7 +103,7 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
             projectCreatorNames: [] as string[],
             projectNames: [] as string[],
             projects: [] as File[][],
-            robotId: '5abf9d95-040a-46d0-9065-a72a7bd8be08',
+            robotId: form.values.robot,
           };
           for (const fileType of form.values.fileTypes) {
             variables.fileTypes = variables.fileTypes.concat(POSSIBLE_FILE_TYPES[fileType]);
@@ -206,7 +232,23 @@ export const DeepAnalyze = ({ parsedCookie }: any) => {
       >
         Add project to compare
       </Button></Center></Grid.Col>
-    </Grid>
+
+      <Grid.Col span={3}><Center><Select
+        value={form.values.robot}
+        onChange={(value) => {
+          form.setValues((prevState) => {
+            prevState.robot = value;
+            return prevState;
+          });
+          form.clearErrors();
+        }}
+        data={data.findAllRobots.map((robot: any) => ({
+          value: robot.id,
+          label: `${robot.name} - ${robot.id.slice(0, 8)}...`,
+          group: robot.growable ? 'Can grows' : 'Stable',
+        }))}
+      /></Center></Grid.Col>
+    </Grid>}
 
   </AppShell>;
 };
