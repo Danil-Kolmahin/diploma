@@ -1,11 +1,11 @@
 import {
-  AppShell,
+  AppShell, Button,
   Center,
   Group,
   Header,
   Loader,
   Navbar,
-  Paper,
+  Paper, Slider, Table,
   Title,
   useMantineTheme,
 } from '@mantine/core';
@@ -21,6 +21,9 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import customEvents from 'highcharts-custom-events';
 import NetworkGraph from 'highcharts/modules/networkgraph';
+import { HistoryElemTable } from './history.elem.table';
+// import { useModals } from '@mantine/modals';
+// import { HistoryElemModel } from './history.elem.model';
 
 customEvents(Highcharts);
 NetworkGraph(Highcharts);
@@ -55,6 +58,7 @@ type Point = { similarity: string, from: string, to: string, weight: number };
 
 export const HistoryElem = ({ parsedCookie }: any) => {
   const theme = useMantineTheme();
+  // const modals = useModals();
   const { id } = useParams();
   const { loading, error, data } = useQuery(FIND_COMPARISON_BY_ID, {
     variables: { id },
@@ -71,6 +75,7 @@ export const HistoryElem = ({ parsedCookie }: any) => {
       }
     },
     series: [{
+      // keys: ['similarity', 'weight'],
       dataLabels: {
         enabled: true,
         linkTextPath: {
@@ -95,9 +100,22 @@ export const HistoryElem = ({ parsedCookie }: any) => {
       link: {
         width: 5,
       },
+      // trackByArea: true,
       events: {
-        click: (...all: any) => {
-          console.log({ all });
+        click: function() {
+          // console.log(this);
+          // console.log(data.findComparisonById.results);
+          // modals.openModal({
+          //   title: 'Make the robot grow',
+          //   children: (
+          //     <HistoryElemModel
+          //       resFunc={(...args: any) => console.log(args)}
+          //       startValue={data && data.findComparisonById.results[
+          //         (this as any).halo.point.index
+          //         ].percent}
+          //     />
+          //   ),
+          // });
         },
       },
     }],
@@ -157,6 +175,12 @@ export const HistoryElem = ({ parsedCookie }: any) => {
         highcharts={Highcharts}
         options={optionsData}
       />
+
+      <Table>
+        <tbody>
+          <HistoryElemTable data={data} />
+        </tbody>
+      </Table>
 
       <Prism
         language='json'

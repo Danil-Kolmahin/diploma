@@ -15,6 +15,7 @@ import { NotificationsProvider } from '@mantine/notifications';
 import { History } from './history/history';
 import { HistoryElem } from './history/history.elem';
 import { Robots } from './robots/robots';
+import { ModalsProvider } from '@mantine/modals';
 
 // const StyledApp = styled.div`
 //   // Your style here
@@ -45,29 +46,31 @@ export function App() {
   return (
     <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
       <MantineProvider theme={{ colorScheme, loader: 'bars' }}>
-        <NotificationsProvider>
-          <Global
-            styles={(theme) => ({
-              body: {
+        <ModalsProvider>
+          <NotificationsProvider>
+            <Global
+              styles={(theme) => ({
+                body: {
+                  height: '100%',
+                  backgroundColor: theme.colorScheme === APP_THEMES.DARK ? theme.colors.dark[8] : theme.colors.gray[0],
+                },
                 height: '100%',
-                backgroundColor: theme.colorScheme === APP_THEMES.DARK ? theme.colors.dark[8] : theme.colors.gray[0],
-              },
-              height: '100%',
-            })}
-          />
-          <Routes>
-            <Route path={ROUTES.ROOT} element={<Main />} />
-            <Route path={ROUTES.LOGIN} element={<Login />} />
-            <Route path={ROUTES.REGISTER} element={<Login />} />
-            <Route path={ROUTES.SETTINGS} element={<AuthSettings />} />
-            <Route path={ROUTES.SIMPLE_DIFF} element={<AuthSimpleDifference />} />
-            <Route path={ROUTES.DEEP_ANALYZE} element={<AuthDeepAnalyze />} />
-            <Route path={ROUTES.HISTORY} element={<AuthHistory />} />
-            <Route path={`${ROUTES.HISTORY}/:id`} element={<AuthHistoryElement />} />
-            <Route path={ROUTES.ROBOTS} element={<AuthRobots />} />
-            <Route path={'*'} element={<AuthNotFound />} />
-          </Routes>
-        </NotificationsProvider>
+              })}
+            />
+            <Routes>
+              <Route path={ROUTES.ROOT} element={<Main />} />
+              <Route path={ROUTES.LOGIN} element={<Login />} />
+              <Route path={ROUTES.REGISTER} element={<Login />} />
+              <Route path={ROUTES.SETTINGS} element={<AuthSettings />} />
+              <Route path={ROUTES.SIMPLE_DIFF} element={<AuthSimpleDifference />} />
+              <Route path={ROUTES.DEEP_ANALYZE} element={<AuthDeepAnalyze />} />
+              <Route path={ROUTES.HISTORY} element={<AuthHistory />} />
+              <Route path={`${ROUTES.HISTORY}/:id`} element={<AuthHistoryElement />} />
+              <Route path={ROUTES.ROBOTS} element={<AuthRobots />} />
+              <Route path={'*'} element={<AuthNotFound />} />
+            </Routes>
+          </NotificationsProvider>
+        </ModalsProvider>
       </MantineProvider>
     </ColorSchemeProvider>
   );
