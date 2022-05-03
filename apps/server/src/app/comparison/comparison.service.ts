@@ -41,7 +41,7 @@ export class ComparisonService {
 
   async findOneById(id: string): Promise<ComparisonsEntity | null> {
     return this.comparisonsRepository.findOne({
-      where: { id }, relations: ['projects', 'createdBy', 'projects.files'],
+      where: { id }, relations: ['projects', 'createdBy', 'projects.files', 'robot'],
     });
   }
 

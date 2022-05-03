@@ -1,5 +1,5 @@
-import { promisify } from 'util';
 import {
+  BASE_CHROMOSOME,
   COMPARING_METHODS,
   ComparisonProjectResult,
   DEFAULT_OPTIONS,
@@ -7,7 +7,8 @@ import {
   RobotsChromosome,
 } from '@diploma-v2/common/constants-common';
 
-const makeRandomWithin = (max = 1, min = 0) => Math.ceil(Math.random() * (max - min - 1)) + min;
+const makeRandomWithin = (max = 1, min = 0) => Math.random() * (max - min) + min;
+const makeRandomIntWithin = (max = 1, min = 0) => Math.ceil(Math.random() * (max - min - 1)) + min;
 
 export const calculateProjectsComparingPercent = (
   chromosome: RobotsChromosome, comparisonResults: ComparisonProjectResult,
@@ -25,7 +26,7 @@ const getDelta = (chromosome, comparisonResults, rightResult: number, abs = true
   return abs ? Math.abs(delta) : delta;
 };
 
-export const makeGeneticCycle = promisify((
+export const makeGeneticCycle = (
   chromosomes: RobotsChromosome[],
   calculationArgs,
   rightResult: number,
@@ -37,12 +38,7 @@ export const makeGeneticCycle = promisify((
   const findResult = chromosomes.find((_, i) => deltaValues[i] === 0);
   if (findResult) return findResult;
 
-  if (chromosomes.length === 1) return makeMutations(chromosomes, {
-    maxMutationsValue: options.maxMutationsValue,
-    minMutationsValue: options.minMutationsValue,
-    minGeneValue: options.minGeneValue,
-    maxGeneValue: options.maxGeneValue,
-  })[0];
+  if (chromosomes.length === 1) return makeMutations(chromosomes)[0];
 
   // calculating the chances of becoming a parent
   const parentChances = deltaValues.map(delta => 1 / delta);
@@ -59,43 +55,49 @@ export const makeGeneticCycle = promisify((
   );
 
   // crossbreeding
-  let children: RobotsChromosome[] = [];
-  parents.forEach((_, i) => {
-    if (i % 2 === 0) {
-      // children[i] = parents[i].slice(0, options.crossoverLine).concat(parents[i + 1].slice(options.crossoverLine));
-      // children[i + 1] = parents[i + 1].slice(0, options.crossoverLine).concat(parents[i].slice(options.crossoverLine));
+  let children: RobotsChromosome[] = parents.reduce((acc, cur, i) => {
+    if (i === 0) return acc.concat({ ...cur });
+    const accLen = acc.length;
+    const lastElem = { ...acc[accLen - 1] };
+    const newLastElem = {};
+    let count = 0;
+    for (const key of Object.keys(BASE_CHROMOSOME)) {
+      if (count < options.crossoverLine) {
+        acc[accLen - 1][key] = cur[key];
+        newLastElem[key] = lastElem[key];
+      } else {
+        acc[accLen - 1][key] = lastElem[key];
+        newLastElem[key] = cur[key];
+      }
+      count++;
     }
-  });
+    return acc.concat(newLastElem);
+  }, []);
 
   // mutations
-  children = makeMutations(chromosomes, {
-    maxMutationsValue: options.maxMutationsValue,
-    minMutationsValue: options.minMutationsValue,
-    minGeneValue: options.minGeneValue,
-    maxGeneValue: options.maxGeneValue,
-  });
+  children = makeMutations(children);
 
   return children.sort((a, b) =>
     getDelta(b, calculationArgs, rightResult) -
     getDelta(a, calculationArgs, rightResult),
   )[0];
-});
+};
 
 const makeMutations = (chromosomes: RobotsChromosome[], options = {
-  maxMutationsValue: 0,
-  minMutationsValue: 0,
-  minGeneValue: undefined,
-  maxGeneValue: undefined,
+  maxMutationsValue: DEFAULT_OPTIONS.maxMutationsValue, minMutationsValue: DEFAULT_OPTIONS.minMutationsValue,
+  minGeneValue: DEFAULT_OPTIONS.minGeneValue,
+  maxGeneValue: DEFAULT_OPTIONS.maxGeneValue,
+  mutationChance: DEFAULT_OPTIONS.mutationChance,
 }): RobotsChromosome[] => {
-  const children = [];
-  children.forEach((_, i) => {
-      if (Math.random() >= 0.5) {
-        const geneNumber = makeRandomWithin(children[i].length);
+  chromosomes.forEach((_, i) => {
+      if (Math.random() >= options.mutationChance) {
+        const geneNumber = makeRandomIntWithin(Object.keys(chromosomes[i]).length);
         const addingValue = makeRandomWithin(options.maxMutationsValue, options.minMutationsValue);
-        if (children[i][geneNumber] + addingValue >= options.minGeneValue &&
-          children[i][geneNumber] + addingValue <= options.maxGeneValue) children[i][geneNumber] += addingValue;
+        const geneKey = Object.keys(chromosomes[i])[geneNumber];
+        if (chromosomes[i][geneKey] + addingValue >= options.minGeneValue &&
+          chromosomes[i][geneKey] + addingValue <= options.maxGeneValue) chromosomes[i][geneKey] += addingValue;
       }
     },
   );
-  return children;
+  return chromosomes;
 };

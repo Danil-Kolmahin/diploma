@@ -59,9 +59,10 @@ export const BASE_CHROMOSOME: RobotsChromosome = {
 };
 export const DEFAULT_OPTIONS = {
   minGeneValue: 0,
-  maxGeneValue: 10,
+  maxGeneValue: 1,
   crossoverLine: 1,
-  minMutationsValue: -0.1,
-  maxMutationsValue: 0.1,
+  minMutationsValue: -0.05,
+  maxMutationsValue: +0.05,
+  mutationChance: 0.5,
 };
 export type makeGeneticCycleOptionT = typeof DEFAULT_OPTIONS;

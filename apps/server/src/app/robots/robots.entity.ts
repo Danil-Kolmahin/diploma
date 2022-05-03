@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, ManyToOne } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { CommonCreatedEntity } from '../common/common.entity';
 import { GraphQLJSON } from 'graphql-type-json';
@@ -24,7 +24,6 @@ export class RobotsEntity extends CommonCreatedEntity {
 @Entity('robots-history')
 export class RobotsHistoryEntity extends RobotsEntity {
   @Field(() => RobotsEntity)
-  @OneToOne(() => RobotsEntity)
-  @JoinColumn()
+  @ManyToOne(() => RobotsEntity)
   currentVersion: RobotsEntity;
 }

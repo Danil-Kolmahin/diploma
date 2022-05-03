@@ -14,6 +14,7 @@ import { BaseIdArgs, BasePaginationArgs } from '../common/common.resolver';
 import * as prettier from 'prettier';
 import * as strip from 'strip-comments';
 import { RobotsService } from '../robots/robots.service';
+import { RobotsEntity } from '../robots/robots.entity';
 
 @Resolver()
 export class ComparisonResolver {
@@ -102,5 +103,22 @@ export class ComparisonResolver {
     @Args('', new ValidationPipe()) { id }: BaseIdArgs,
   ): Promise<ComparisonsEntity | null> {
     return this.comparisonService.findOneById(id);
+  }
+
+  @Mutation(() => RobotsEntity)
+  @UseGuards(GqlAuthGuard)
+  async growRobot(
+    @Args('comparisonId') comparisonId: string,
+    @Args('firstProjectId') firstProjectId: string,
+    @Args('secondProjectId') secondProjectId: string,
+    @Args('rightPercent') rightPercent: number,
+  ): Promise<RobotsEntity> {
+    const comparison = await this.comparisonService.findOneById(comparisonId);
+    return this.robotsService.growOneById(
+      comparison,
+      firstProjectId,
+      secondProjectId,
+      rightPercent,
+    );
   }
 }

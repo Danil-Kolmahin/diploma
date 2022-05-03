@@ -44,7 +44,13 @@ export class RobotsService {
     prevRobot: RobotsEntity,
     newRobot: { name?: string, body?: RobotsChromosome },
   ): Promise<RobotsEntity> {
-    await this.robotsHistoryRepository.save({ ...prevRobot, currentVersion: prevRobot });
+    await this.robotsHistoryRepository.save({
+      ...prevRobot,
+      currentVersion: prevRobot,
+      id: undefined,
+      createdAt: undefined,
+      updatedAt: undefined,
+    });
     for (const [key, value] of Object.entries(newRobot)) {
       prevRobot[key] = value;
     }
@@ -70,17 +76,20 @@ export class RobotsService {
   }
 
   async growOneById(
-    robot: RobotsEntity,
     comparison: ComparisonsEntity,
+    firstProjectId: string,
+    secondProjectId: string,
     rightResult: number,
   ): Promise<RobotsEntity> {
+    if (!comparison.robot.growable) return comparison.robot;
     const prevRobots = await this
-      .findAllHistoryByRobotPG(robot, { limit: 5 }); // todo make const
-    return this.updateOne(robot, {
-      ...robot,
-      body: await makeGeneticCycle(
-        [robot.body, ...(prevRobots.map(r => r.body))],
-        comparison.results,
+      .findAllHistoryByRobotPG(comparison.robot, { limit: 5 }); // todo make const
+    return this.updateOne(comparison.robot, {
+      ...comparison.robot,
+      body: makeGeneticCycle(
+        [comparison.robot.body, ...(prevRobots.map(r => r.body))],
+        comparison.results[`${firstProjectId}|${secondProjectId}`] ||
+        comparison.results[`${secondProjectId}|${firstProjectId}`],
         rightResult,
         DEFAULT_OPTIONS, // todo use users options
       ) as RobotsChromosome,
@@ -97,7 +106,7 @@ export class RobotsService {
   async deleteOne(id: string): Promise<DeleteResult> {
     await this.robotsHistoryRepository.delete({
       currentVersion: await this.findOneById(id),
-    })
+    });
     return this.robotsRepository.delete({ id });
   }
 }
