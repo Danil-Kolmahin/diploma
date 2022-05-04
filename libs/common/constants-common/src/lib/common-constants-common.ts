@@ -32,6 +32,7 @@ export const POSSIBLE_FILE_TYPES: { [key: string]: string[] } = {
 export enum COMPARING_METHODS {
   FTC = 'FTC',
   DLD = 'DLD',
+  JIndex = 'JIndex',
 }
 
 export interface ComparisonResult {
@@ -53,10 +54,11 @@ export interface CookieTokenDataI {
 }
 
 export const MAX_32BIT_INT = 2 ** 31 - 1;
-export const BASE_CHROMOSOME: RobotsChromosome = {
-  'FTC': 0.5,
-  'DLD': 0.5,
-};
+export const BASE_CHROMOSOME: RobotsChromosome = (
+  Object.keys(COMPARING_METHODS) as Array<keyof typeof COMPARING_METHODS>
+).reduce((acc, cur) => ({
+  ...acc, [cur]: 1 / Object.keys(COMPARING_METHODS).length,
+}), {} as RobotsChromosome);
 export const DEFAULT_OPTIONS = {
   minGeneValue: 0,
   maxGeneValue: 1,

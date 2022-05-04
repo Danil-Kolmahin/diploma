@@ -10,6 +10,7 @@ import { FilesEntity } from '../files/files.entity';
 import { factorial } from '@diploma-v2/common/utils-common';
 import { damerauLevenshtein } from '@diploma-v2/common/source-codes-comparing-methods';
 import { calculateProjectsComparingPercent } from '@diploma-v2/common/artificial-intelligence';
+import * as Jaccard from 'jaccard-index';
 
 @Injectable()
 export class ComparisonService {
@@ -60,11 +61,17 @@ export class ComparisonService {
         results[curProjectPath]['DLD'] = 0;  // Damerau Levenshtein Distance
         let totalDLDFilesLength = 0;
 
+        let curProjectFilesForJaccard = [];
+        let projectToCompareFilesForJaccard = [];
+
         for (let ci = 0; ci < curProject.files.length; ci++) {
           for (let cj = 0; cj < projectToCompare.files.length; cj++) {
-            // if (!curProject.files[ci].minifiedData) {
-            //
-            // }
+            if (curProject.files[ci].minifiedData)
+              curProjectFilesForJaccard = curProjectFilesForJaccard
+                .concat(curProject.files[ci].minifiedData.split(','));
+            if (projectToCompare.files[cj].minifiedData)
+              projectToCompareFilesForJaccard = projectToCompareFilesForJaccard
+                .concat(projectToCompare.files[cj].minifiedData.split(','));
 
             const [simpleStringsLength, newSimplePieces] = await this.fullTextComparison(
               curProject.files[ci], projectToCompare.files[cj],
@@ -82,6 +89,10 @@ export class ComparisonService {
 
         results[curProjectPath]['FTC'] /= totalFTCFilesLength;
         results[curProjectPath]['DLD'] /= totalDLDFilesLength;
+        results[curProjectPath]['JIndex'] = (await this.jaccardIndexComparison({
+          [curProject.id]: curProjectFilesForJaccard,
+          [projectToCompare.id]: projectToCompareFilesForJaccard,
+        }))[0].value;
 
         results[curProjectPath]['percent'] = calculateProjectsComparingPercent(
           cmp.robot.body, results[curProjectPath],
@@ -108,5 +119,16 @@ export class ComparisonService {
       simpleStringsLength += value.length;
     });
     return [simpleStringsLength, simplePieces];
+  }
+
+  async jaccardIndexComparison(projects: {
+    [key: string]: string[]
+  }): Promise<{ source: string, target: string, value: number }[]> {
+    const items = Object.keys(projects);
+    return new Promise((resolve, reject) => {
+      Jaccard({
+        getLog: (item) => Promise.resolve(projects[item]),
+      }).getLinks(items).then(resolve).catch(reject);
+    });
   }
 }

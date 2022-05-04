@@ -16,7 +16,7 @@ export const calculateProjectsComparingPercent = (
   let comparisonPercent = 0;
   for (const [key, value] of Object.entries(comparisonResults)) {
     if (Object.values<string>(COMPARING_METHODS).includes(key))
-      comparisonPercent += chromosome[key] * value;
+      comparisonPercent += (chromosome[key] || 0) * value;
   }
   return comparisonPercent;
 };
