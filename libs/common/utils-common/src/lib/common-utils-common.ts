@@ -49,3 +49,16 @@ export const sum = (x: number, y: number) => x + y;
 export const sleep = (ms: number) => new Promise(
   (resolve) => setTimeout(resolve, ms),
 );
+
+export const getCircularReplacer = () => {
+  const seen = new WeakSet();
+  return (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return;
+      }
+      seen.add(value);
+    }
+    return value;
+  };
+};

@@ -62,6 +62,10 @@ export class ComparisonService {
 
         for (let ci = 0; ci < curProject.files.length; ci++) {
           for (let cj = 0; cj < projectToCompare.files.length; cj++) {
+            // if (!curProject.files[ci].minifiedData) {
+            //
+            // }
+
             const [simpleStringsLength, newSimplePieces] = await this.fullTextComparison(
               curProject.files[ci], projectToCompare.files[cj],
             );

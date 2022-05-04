@@ -7,7 +7,7 @@ import { ComparisonsEntity } from './comparison.entity';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { FilesService } from '../files/files.service';
 import { ProjectsService } from '../projects/projects.service';
-import { checkFileType } from '@diploma-v2/common/utils-common';
+import { checkFileType, getCircularReplacer } from '@diploma-v2/common/utils-common';
 import { CookieTokenDataI } from '@diploma-v2/common/constants-common';
 import { UsersService } from '../users/users.service';
 import { BaseIdArgs, BasePaginationArgs } from '../common/common.resolver';
@@ -15,6 +15,7 @@ import * as prettier from 'prettier';
 import * as strip from 'strip-comments';
 import { RobotsService } from '../robots/robots.service';
 import { RobotsEntity } from '../robots/robots.entity';
+import * as UglifyJS from 'uglify-js';
 
 @Resolver()
 export class ComparisonResolver {
@@ -46,14 +47,26 @@ export class ComparisonResolver {
       for await (const file of files) {
         if (!checkFileType(file.filename, fileTypes)) continue;
         let data = (await streamToBuffer(file.createReadStream())).toString();
+        let minifiedData;
+        let dataAST;
         try {
           data = prettier.format(data, { parser: 'babel-ts' });
           data = strip(data);
+          const uglified = UglifyJS.minify(data, {
+            toplevel: true,
+            output: {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              ast: true,
+            }
+          });
+          if (!uglified.error) minifiedData = uglified.code;
+          if (!uglified.error) dataAST = JSON.stringify((uglified as any).ast, getCircularReplacer());
         } catch (error) {
           console.log({ error, date: new Date() });
         }
         const savedFile = await this.filesService.createOne({
-          ...file, data, byteLength: Buffer.byteLength(data), createdBy: user,
+          ...file, data, byteLength: Buffer.byteLength(data), createdBy: user, minifiedData, dataAST
         });
         if (savedFile && savedFile.data) savedFile.data = savedFile.data.toString();
         projectFiles.push(savedFile);
