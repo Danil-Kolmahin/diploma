@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Center, Slider } from '@mantine/core';
 import { gql, useMutation } from '@apollo/client';
+import { formList, useForm } from '@mantine/form';
 
 const GROW_ROBOT = gql`
   mutation (
@@ -32,9 +33,13 @@ export const HistoryElemTable = (props: {
         .results[`${curProject.id}|${projectToCompare.id}`].percent);
     }
   }
-  const [values, setValues] = useState<number[]>(table);
-  const [endValues, setEndValues] = useState<number[]>(table);
   const [growRandom] = useMutation(GROW_ROBOT);
+  const form = useForm({
+    initialValues: {
+      values: formList<number>(table),
+      endValues: formList<number>(table),
+    },
+  });
 
   return <>
     {(() => {
@@ -58,15 +63,21 @@ export const HistoryElemTable = (props: {
         <td>{project.secondProjectName}</td>
         <td>
           <Slider
-            value={values[index] * 100}
-            onChange={(newValue) => setValues((prev) => {
-              prev[index] = newValue / 100;
-              return prev;
-            })}
-            onChangeEnd={(newValue) => setEndValues((prev) => {
-              prev[index] = newValue / 100;
-              return prev;
-            })}
+            value={form.values.values[index] * 100}
+            onChange={(newValue) => {
+              form.setValues((prev) => {
+                prev.values[index] = newValue / 100;
+                return prev;
+              });
+              form.validate();
+            }}
+            onChangeEnd={(newValue) => {
+              form.setValues((prev) => {
+                prev.endValues[index] = newValue / 100;
+                return prev;
+              });
+              form.validate();
+            }}
           />
         </td>
         <td><Center>
@@ -74,7 +85,7 @@ export const HistoryElemTable = (props: {
             onClick={() => growRandom({
               variables: {
                 comparisonId: props.data.findComparisonById.id,
-                rightPercent: endValues[index],
+                rightPercent: form.values.endValues[index],
                 firstProjectId: project.firstProjectId,
                 secondProjectId: project.secondProjectId,
               },
