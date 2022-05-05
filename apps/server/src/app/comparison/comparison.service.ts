@@ -60,6 +60,8 @@ export class ComparisonService {
         let totalFTCFilesLength = 0;
         results[curProjectPath]['DLD'] = 0;  // Damerau Levenshtein Distance
         let totalDLDFilesLength = 0;
+        results[curProjectPath]['AST_FTC'] = 0;
+        let totalASTFTCFilesLength = 0;
 
         let curProjectFilesForJaccard = [];
         let projectToCompareFilesForJaccard = [];
@@ -84,6 +86,13 @@ export class ComparisonService {
               curProject.files[ci].data.toString(), projectToCompare.files[cj].data.toString(),
             );
             totalDLDFilesLength += Math.max(curProject.files[ci].byteLength, projectToCompare.files[cj].byteLength);
+
+            const curProjectDataAST = JSON.stringify(curProject.files[ci].dataAST);
+            const projectToCompareDataAST = JSON.stringify(projectToCompare.files[ci].dataAST);
+            results[curProjectPath]['AST_FTC'] += await this.fullTextComparisonString(
+              curProjectDataAST, projectToCompareDataAST,
+            );
+            totalASTFTCFilesLength += Math.min(curProjectDataAST.length, projectToCompareDataAST.length);
           }
         }
 
@@ -93,6 +102,7 @@ export class ComparisonService {
           [curProject.id]: curProjectFilesForJaccard,
           [projectToCompare.id]: projectToCompareFilesForJaccard,
         }))[0].value;
+        results[curProjectPath]['AST_FTC'] /= totalASTFTCFilesLength;
 
         results[curProjectPath]['percent'] = calculateProjectsComparingPercent(
           cmp.robot.body, results[curProjectPath],
@@ -130,5 +140,15 @@ export class ComparisonService {
         getLog: (item) => Promise.resolve(projects[item]),
       }).getLinks(items).then(resolve).catch(reject);
     });
+  }
+
+  async fullTextComparisonString(str1: string, str2: string): Promise<number> {
+    const result = await (new Greedy()).differences(str1, str2);
+    let simpleStringsLength = 0;
+    result.forEach(({ type, value }: { type: string, value: string }) => {
+      if (type !== 'eql') return;
+      simpleStringsLength += value.length;
+    });
+    return simpleStringsLength;
   }
 }

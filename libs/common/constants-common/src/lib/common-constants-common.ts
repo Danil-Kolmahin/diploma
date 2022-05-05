@@ -33,6 +33,7 @@ export enum COMPARING_METHODS {
   FTC = 'FTC',
   DLD = 'DLD',
   JIndex = 'JIndex',
+  AST_FTC = 'AST_FTC',
 }
 
 export interface ComparisonResult {

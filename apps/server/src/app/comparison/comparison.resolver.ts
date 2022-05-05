@@ -61,7 +61,9 @@ export class ComparisonResolver {
             }
           });
           if (!uglified.error) minifiedData = uglified.code;
-          if (!uglified.error) dataAST = JSON.stringify((uglified as any).ast, getCircularReplacer());
+          if (!uglified.error) dataAST = JSON.parse(JSON.stringify(
+            (uglified as any).ast, getCircularReplacer()
+          ));
         } catch (error) {
           console.log({ error, date: new Date() });
         }
