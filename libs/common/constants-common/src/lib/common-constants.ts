@@ -34,6 +34,7 @@ export enum COMPARING_METHODS {
   DLD = 'DLD',
   JIndex = 'JIndex',
   AST_FTC = 'AST_FTC',
+  RKC = 'RKC',
 }
 
 export interface ComparisonResult {
@@ -69,3 +70,5 @@ export const DEFAULT_OPTIONS = {
   mutationChance: 0.5,
 };
 export type makeGeneticCycleOptionT = typeof DEFAULT_OPTIONS;
+
+export const NEXT_LINE_REGEX = /(\r\n|\r|\n)/;

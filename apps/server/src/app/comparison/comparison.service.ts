@@ -4,10 +4,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ComparisonsEntity } from './comparison.entity';
 import { CommonEntity } from '../common/common.entity';
 import { UsersEntity } from '../users/users.entity';
-import { ComparisonProjectResult, ComparisonResult, MAX_32BIT_INT } from '@diploma-v2/common/constants-common';
+import {
+  ComparisonProjectResult,
+  ComparisonResult,
+  MAX_32BIT_INT,
+  RESERVED_KEYWORDS,
+} from '@diploma-v2/common/constants-common';
 import { Greedy } from 'string-mismatch';
 import { FilesEntity } from '../files/files.entity';
-import { factorial } from '@diploma-v2/common/utils-common';
+import { factorial, isReservedKeywords } from '@diploma-v2/common/utils-common';
 import { damerauLevenshtein } from '@diploma-v2/common/source-codes-comparing-methods';
 import { calculateProjectsComparingPercent } from '@diploma-v2/common/artificial-intelligence';
 import * as Jaccard from 'jaccard-index';
@@ -62,6 +67,12 @@ export class ComparisonService {
         let totalDLDFilesLength = 0;
         results[curProjectPath]['AST_FTC'] = 0;
         let totalASTFTCFilesLength = 0;
+        const totalRKCCurProject = Object.keys(RESERVED_KEYWORDS).reduce((acc, cur) => ({
+          ...acc, [cur]: 0,
+        }), {});
+        const totalRKCProjectToCompare = Object.keys(RESERVED_KEYWORDS).reduce((acc, cur) => ({
+          ...acc, [cur]: 0,
+        }), {});
 
         let curProjectFilesForJaccard = [];
         let projectToCompareFilesForJaccard = [];
@@ -93,16 +104,37 @@ export class ComparisonService {
               curProjectDataAST, projectToCompareDataAST,
             );
             totalASTFTCFilesLength += Math.min(curProjectDataAST.length, projectToCompareDataAST.length);
+
+            Object.entries(await this.countReservedKeywords(
+              curProject.files[ci].data,
+            )).forEach(([key, value]) =>
+              totalRKCCurProject[key] += value);
+            Object.entries(await this.countReservedKeywords(
+              projectToCompare.files[cj].data,
+            )).forEach(([key, value]) =>
+              totalRKCProjectToCompare[key] += value);
           }
         }
 
         results[curProjectPath]['FTC'] /= totalFTCFilesLength;
         results[curProjectPath]['DLD'] /= totalDLDFilesLength;
-        results[curProjectPath]['JIndex'] = (await this.jaccardIndexComparison({
+        const JIndex = await this.jaccardIndexComparison({
           [curProject.id]: curProjectFilesForJaccard,
           [projectToCompare.id]: projectToCompareFilesForJaccard,
-        }))[0].value;
+        });
+        results[curProjectPath]['JIndex'] = JIndex && JIndex[0] && JIndex[0].value;
         results[curProjectPath]['AST_FTC'] /= totalASTFTCFilesLength;
+        let RKCReservedKeywordsLength = Object.keys(RESERVED_KEYWORDS).length;
+        results[curProjectPath]['RKC'] = Object.keys(RESERVED_KEYWORDS) // Reserved Keywords Comparison
+          .reduce((acc, key) => {
+            const max = Math.max(totalRKCCurProject[key], totalRKCProjectToCompare[key]);
+            if (max === 0) {
+              RKCReservedKeywordsLength--;
+              return acc;
+            }
+            const min = Math.min(totalRKCCurProject[key], totalRKCProjectToCompare[key]);
+            return acc + min / max;
+          }, 0) / RKCReservedKeywordsLength;
 
         results[curProjectPath]['percent'] = calculateProjectsComparingPercent(
           cmp.robot.body, results[curProjectPath],
@@ -150,5 +182,21 @@ export class ComparisonService {
       simpleStringsLength += value.length;
     });
     return simpleStringsLength;
+  }
+
+  async countReservedKeywords(file: string): Promise<{
+    [key in RESERVED_KEYWORDS]: number
+  }> {
+    const preparedFile = file.replace(/[{}!();]/g, '');
+    const result = Object.keys(RESERVED_KEYWORDS).reduce((acc, cur) => ({
+      ...acc, [cur]: 0,
+    }), {}) as { [key in RESERVED_KEYWORDS]: number };
+    for (const pretender of preparedFile.split(/(\s|\r\n|\r|\n)/)) {
+      if (isReservedKeywords(pretender)) {
+        if (!result[pretender]) result[pretender] = 0;
+        result[pretender]++;
+      }
+    }
+    return result;
   }
 }

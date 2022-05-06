@@ -1,1 +1,2 @@
-export * from './lib/common-utils-common';
+export * from './lib/common-utils';
+export * from './lib/ts-syntax';

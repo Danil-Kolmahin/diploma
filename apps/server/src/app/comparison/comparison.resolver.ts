@@ -1,10 +1,10 @@
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ComparisonService } from './comparison.service';
-import { UseGuards, BadRequestException, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, UseGuards, ValidationPipe } from '@nestjs/common';
 import { Auth, GqlAuthGuard } from '../auth/gql.auth-guard';
 import { streamToBuffer } from '@diploma-v2/backend/utils-backend';
 import { ComparisonsEntity } from './comparison.entity';
-import { GraphQLUpload, FileUpload } from 'graphql-upload';
+import { FileUpload, GraphQLUpload } from 'graphql-upload';
 import { FilesService } from '../files/files.service';
 import { ProjectsService } from '../projects/projects.service';
 import { checkFileType, getCircularReplacer } from '@diploma-v2/common/utils-common';
@@ -58,17 +58,17 @@ export class ComparisonResolver {
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               ast: true,
-            }
+            },
           });
           if (!uglified.error) minifiedData = uglified.code;
           if (!uglified.error) dataAST = JSON.parse(JSON.stringify(
-            (uglified as any).ast, getCircularReplacer()
+            (uglified as any).ast, getCircularReplacer(),
           ));
         } catch (error) {
           console.log({ error, date: new Date() });
         }
         const savedFile = await this.filesService.createOne({
-          ...file, data, byteLength: Buffer.byteLength(data), createdBy: user, minifiedData, dataAST
+          ...file, data, byteLength: Buffer.byteLength(data), createdBy: user, minifiedData, dataAST,
         });
         if (savedFile && savedFile.data) savedFile.data = savedFile.data.toString();
         projectFiles.push(savedFile);
