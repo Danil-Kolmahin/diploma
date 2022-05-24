@@ -209,7 +209,7 @@ export const Robots = ({ parsedCookie }: any) => {
                     variables: { ...form.values.robots[index] },
                   });
                   await refetch();
-                }}>Submit</Button>
+                }}>Update</Button>
               </Stack>
             </Grid.Col>
           </Grid>
@@ -226,7 +226,7 @@ export const Robots = ({ parsedCookie }: any) => {
           await refetch();
         }}
       >
-        Update
+        Add one more
       </Button>
     </>
     }
