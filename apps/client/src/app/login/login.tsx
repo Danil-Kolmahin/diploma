@@ -145,7 +145,7 @@ export const Login = () => {
             {isRegister && (
               <Checkbox
                 mt='xl'
-                label='I agree to sell my soul and privacy to this corporation'
+                label='I agree to trust my privacy to this corporation'
                 {...form.getInputProps('termsOfService', { type: 'checkbox' })}
               />
             )}
