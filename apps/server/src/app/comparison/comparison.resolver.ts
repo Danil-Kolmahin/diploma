@@ -68,9 +68,9 @@ export class ComparisonResolver {
           console.log({ error, date: new Date() });
         }
         const savedFile = await this.filesService.createOne({
-          ...file, data: new Buffer(data),
+          ...file, data: Buffer.from(data),
           byteLength: Buffer.byteLength(data), createdBy: user,
-          minifiedData: new Buffer(minifiedData),
+          minifiedData: Buffer.from(minifiedData),
           dataAST,
         });
         projectFiles.push(savedFile);
