@@ -29,8 +29,12 @@ export const HistoryElemTable = (props: {
     const curProject = props.data.findComparisonById.projects[i];
     for (let j = i + 1; j < props.data.findComparisonById.projects.length; j++) {
       const projectToCompare = props.data.findComparisonById.projects[j];
-      table.push(props.data.findComparisonById
-        .results[`${curProject.id}|${projectToCompare.id}`].percent);
+      table.push(
+        props.data.findComparisonById.results ?
+          props.data.findComparisonById
+            .results[`${curProject.id}|${projectToCompare.id}`].percent :
+          0, // bad...
+      );
     }
   }
   const [growRandom] = useMutation(GROW_ROBOT);
