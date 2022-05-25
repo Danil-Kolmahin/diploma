@@ -81,10 +81,10 @@ export class ComparisonService {
           for (let cj = 0; cj < projectToCompare.files.length; cj++) {
             if (curProject.files[ci].minifiedData)
               curProjectFilesForJaccard = curProjectFilesForJaccard
-                .concat(curProject.files[ci].minifiedData.split(','));
+                .concat(curProject.files[ci].minifiedData.toString().split(','));
             if (projectToCompare.files[cj].minifiedData)
               projectToCompareFilesForJaccard = projectToCompareFilesForJaccard
-                .concat(projectToCompare.files[cj].minifiedData.split(','));
+                .concat(projectToCompare.files[cj].minifiedData.toString().split(','));
 
             const [simpleStringsLength, newSimplePieces] = await this.fullTextComparison(
               curProject.files[ci], projectToCompare.files[cj],
@@ -106,11 +106,11 @@ export class ComparisonService {
             totalASTFTCFilesLength += Math.min(curProjectDataAST.length, projectToCompareDataAST.length);
 
             Object.entries(await this.countReservedKeywords(
-              curProject.files[ci].data,
+              curProject.files[ci].data.toString(),
             )).forEach(([key, value]) =>
               totalRKCCurProject[key] += value);
             Object.entries(await this.countReservedKeywords(
-              projectToCompare.files[cj].data,
+              projectToCompare.files[cj].data.toString(),
             )).forEach(([key, value]) =>
               totalRKCProjectToCompare[key] += value);
           }

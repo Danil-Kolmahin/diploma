@@ -18,13 +18,13 @@ export class FilesEntity extends CommonCreatedEntity {
   @Column({ type: 'varchar' })
   encoding: string;
 
-  @Field()
+  @Field(() => String)
   @Column({ type: 'bytea' })
-  data: string;
+  data: Buffer;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ type: 'bytea', nullable: true })
-  minifiedData?: string;
+  minifiedData?: Buffer;
 
   @Field(() => GraphQLJSON, { nullable: true })
   @Column({ type: 'json', nullable: true })
