@@ -99,6 +99,7 @@ export class RobotsService {
   async findAll(user: UsersEntity): Promise<RobotsEntity[]> {
     return this.robotsRepository.find({
       where: { createdBy: user },
+      relations: ['createdBy'],
       order: { createdAt: 'ASC' },
     });
   }
