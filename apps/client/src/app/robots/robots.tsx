@@ -96,7 +96,9 @@ export const Robots = ({ parsedCookie }: any) => {
   const form = useForm({
     initialValues: { robots: formList<Robot>([]) },
   });
-  const { loading, error, data, refetch } = useQuery(FIND_ALL_ROBOTS);
+  const { loading, error, data, refetch } = useQuery(FIND_ALL_ROBOTS, {
+    pollInterval: 500,
+  });
   const [updateRobot] = useMutation(UPDATE_ROBOT);
   const [deleteRobot] = useMutation(DELETE_ROBOT);
   const [createRobot] = useMutation(CREATE_ROBOT);
